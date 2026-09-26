@@ -1,0 +1,5 @@
+.venv/
+__pycache__/
+data/youtube.db
+.env
+.DS_Store

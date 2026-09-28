@@ -2,7 +2,11 @@ import re
 
 import feedparser
 import requests
-from storage import add_video_to_database, save_channel_to_database
+from storage import (
+    add_video_to_database,
+    check_if_video_exist_in_database,
+    save_channel_to_database,
+)
 
 
 class YoutubeChannel:
@@ -15,15 +19,18 @@ class YoutubeChannel:
 
     def set_baseline_video(self):
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}')
-        for video in parsed["entries"][:1]:
-            yt_videoid = video["yt_videoid"]
-            title = video["title"]
-            link = video["link"]
-            name = video["author"]
-            published = video["published"]
-            thumbnail = video["media_group"]["media_thumbnail"][0]["url"]
-            channel_id = video["yt_channelid"]
-            add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
+
+        video = parsed["entries"][0]
+
+        yt_videoid = video["yt_videoid"]
+        title = video["title"]
+        link = video["link"]
+        name = video["author"]
+        published = video["published"]
+        thumbnail = video["media_group"]["media_thumbnail"][0]["url"]
+        channel_id = video["yt_channelid"]
+
+        add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
 
 
 
@@ -62,8 +69,18 @@ def get_youtube_channel():
 def check_for_new_video(channels):
     for channel in channels:
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={channel["channel_id"]}')
-        print(parsed)
-        for video in parsed["entries"][:3]:
-            print(video["title"])
-            print(video["yt_videoid"])
-            print(video["published"])
+
+        for video in reversed(parsed["entries"][:3]):
+            published = video["published"]
+            channel_id = video["yt_channelid"]
+
+            if not check_if_video_exist_in_database(published, channel_id):
+                yt_videoid = video["yt_videoid"]
+                title = video["title"]
+                link = video["link"]
+                name = video["author"]
+                published = video["published"]
+                thumbnail = video["media_group"]["media_thumbnail"][0]["url"]
+                channel_id = video["yt_channelid"]
+
+                add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)

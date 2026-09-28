@@ -2,7 +2,7 @@ import re
 
 import feedparser
 import requests
-from storage import save_channel_to_database
+from storage import add_video_to_database, save_channel_to_database
 
 
 class YoutubeChannel:
@@ -13,28 +13,57 @@ class YoutubeChannel:
     def save(self):
         save_channel_to_database(self.channel_id, self.name)
 
+    def set_baseline_video(self):
+        parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}')
+        for video in parsed["entries"][:1]:
+            yt_videoid = video["yt_videoid"]
+            title = video["title"]
+            link = video["link"]
+            name = video["author"]
+            published = video["published"]
+            thumbnail = video["media_group"]["media_thumbnail"][0]["url"]
+            channel_id = video["yt_channelid"]
+            add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
 
-def get_youtube_channel_id_and_name():
-    youtube_handle = input("What is the YouTube handle of the channel you want to track? ").strip()
 
-    if re.search('^@[A-Za-z0-9](?:[A-Za-z0-9_.-]{1,28}[A-Za-z0-9])?$', youtube_handle):
-        r = requests.get(f'https://www.youtube.com/{youtube_handle}')
-        index = r.text.find('"mainEntity":')
-        r = (r.text[index-50:index+1000])
 
-        matches =  re.search(r'.+mainEntity":{"@type":"Person","name":"(.+)","url":"https://www.youtube.com/channel/(UC[A-Za-z0-9_-]{22})"', r)
+    @classmethod
+    def extract_channel_id_and_name_from_handle(cls, handle: str):
+        if re.search('^@[A-Za-z0-9](?:[A-Za-z0-9_.-]{1,28}[A-Za-z0-9])?$', handle):
 
-        if matches:
-            channel = YoutubeChannel(matches.group(2), matches.group(1))
-            YoutubeChannel.save(channel)
-    else:
-        print("Invalid YouTube handle")
+            r = requests.get(f'https://www.youtube.com/{handle}')
+
+            index = r.text.find('"mainEntity":')
+
+            section = (r.text[index-50:index+1000])
+
+            matches =  re.search(r'.+mainEntity":{"@type":"Person","name":"(.+)","url":"https://www.youtube.com/channel/(UC[A-Za-z0-9_-]{22})"', section)
+
+            if matches:
+                return cls(
+                    channel_id = matches.group(2),
+                    name = matches.group(1)
+                )
+        else:
+            print("Invalid YouTube handle")
+
+
+
+def get_youtube_channel():
+    handle = input("What is the YouTube handle of the channel you want to track? ").strip()
+
+    channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
+
+    if channel is not None:
+        channel.save()
+        channel.set_baseline_video()
 
 
 def check_for_new_video(channels):
     for channel in channels:
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={channel["channel_id"]}')
-        for video in parsed["entries"]:
+        print(parsed)
+        for video in parsed["entries"][:3]:
             print(video["title"])
             print(video["yt_videoid"])
             print(video["published"])

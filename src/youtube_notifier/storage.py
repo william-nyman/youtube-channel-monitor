@@ -44,8 +44,12 @@ def save_channel_to_database(channel_id, name):
                     VALUES (?, ?)
                 """, (channel_id, name))
 
+            return True
+
         except sqlite3.IntegrityError:
             print("Channel already exists in database")
+
+            return False
 
 def return_list_of_channels_in_db():
     channels = []

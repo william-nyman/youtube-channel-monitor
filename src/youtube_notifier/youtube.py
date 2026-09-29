@@ -17,7 +17,7 @@ class YoutubeChannel:
         self.name = name
 
     def save(self):
-        save_channel_to_database(self.channel_id, self.name)
+        return save_channel_to_database(self.channel_id, self.name)
 
     def set_baseline_video(self):
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}')
@@ -69,9 +69,8 @@ def get_youtube_channel():
 
     channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
 
-    if channel is not None:
-        channel.save()
-        channel.set_baseline_video()
+    if channel is not None and channel.save():
+            channel.set_baseline_video()
 
 
 def check_for_new_video(channels):
@@ -81,6 +80,10 @@ def check_for_new_video(channels):
         for video in reversed(parsed["entries"][:3]):
             published = video["published"]
             channel_id = video["yt_channelid"]
+            yt_videoid = video["yt_videoid"]
+
+            if check_if_short(yt_videoid):
+                continue
 
             if not check_if_video_exist_in_database(published, channel_id):
                 yt_videoid = video["yt_videoid"]
@@ -91,15 +94,13 @@ def check_for_new_video(channels):
                 thumbnail = video["media_thumbnail"][0]["url"]
                 channel_id = video["yt_channelid"]
 
-                if check_if_short(yt_videoid):
-                    continue
+
 
                 add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
 
                 send_new_video_notification(title, thumbnail, name, published, link)
 
 def check_if_short(yt_videoid):
-    print("Checking video:", yt_videoid)
     url = f"https://www.youtube.com/shorts/{yt_videoid}"
 
     with yt_dlp.YoutubeDL({"quiet": True}) as ydl:

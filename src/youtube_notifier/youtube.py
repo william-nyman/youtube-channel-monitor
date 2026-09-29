@@ -2,6 +2,7 @@ import re
 
 import feedparser
 import requests
+from notifications import send_new_video_notification
 from storage import (
     add_video_to_database,
     check_if_video_exist_in_database,
@@ -31,6 +32,7 @@ class YoutubeChannel:
         channel_id = video["yt_channelid"]
 
         add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
+        send_new_video_notification(title, thumbnail, name, published, link)
 
     @classmethod
     def extract_channel_id_and_name_from_handle(cls, handle: str):
@@ -82,3 +84,5 @@ def check_for_new_video(channels):
                 channel_id = video["yt_channelid"]
 
                 add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
+
+                send_new_video_notification(title, thumbnail, name, published, link)

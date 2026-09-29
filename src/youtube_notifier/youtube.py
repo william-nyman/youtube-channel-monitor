@@ -27,12 +27,10 @@ class YoutubeChannel:
         link = video["link"]
         name = video["author"]
         published = video["published"]
-        thumbnail = video["media_group"]["media_thumbnail"][0]["url"]
+        thumbnail = video["media_thumbnail"][0]["url"]
         channel_id = video["yt_channelid"]
 
         add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
-
-
 
     @classmethod
     def extract_channel_id_and_name_from_handle(cls, handle: str):
@@ -80,7 +78,7 @@ def check_for_new_video(channels):
                 link = video["link"]
                 name = video["author"]
                 published = video["published"]
-                thumbnail = video["media_group"]["media_thumbnail"][0]["url"]
+                thumbnail = video["media_content"]["media_thumbnail"][0]["url"]
                 channel_id = video["yt_channelid"]
 
                 add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)

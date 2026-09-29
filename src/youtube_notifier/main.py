@@ -1,3 +1,5 @@
+import pathlib
+
 from storage import (
     create_channels_table,
     create_videos_table,
@@ -5,6 +7,7 @@ from storage import (
 )
 from youtube import check_for_new_video, get_youtube_channel
 
+pathlib.Path("data/").mkdir(parents=True, exist_ok=True)
 
 def main():
     create_videos_table()

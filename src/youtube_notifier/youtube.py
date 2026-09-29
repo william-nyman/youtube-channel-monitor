@@ -2,6 +2,7 @@ import re
 
 import feedparser
 import requests
+import yt_dlp
 from notifications import send_new_video_notification
 from storage import (
     add_video_to_database,
@@ -21,18 +22,25 @@ class YoutubeChannel:
     def set_baseline_video(self):
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}')
 
-        video = parsed["entries"][0]
+        for video in parsed["entries"]:
 
-        yt_videoid = video["yt_videoid"]
-        title = video["title"]
-        link = video["link"]
-        name = video["author"]
-        published = video["published"]
-        thumbnail = video["media_thumbnail"][0]["url"]
-        channel_id = video["yt_channelid"]
+            yt_videoid = video["yt_videoid"]
 
-        add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
-        send_new_video_notification(title, thumbnail, name, published, link)
+            if check_if_short(yt_videoid):
+                continue
+
+            title = video["title"]
+            link = video["link"]
+            name = video["author"]
+
+            published = video["published"]
+            thumbnail = video["media_thumbnail"][0]["url"]
+            channel_id = video["yt_channelid"]
+
+            add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
+            send_new_video_notification(title, thumbnail, name, published, link)
+
+            return
 
     @classmethod
     def extract_channel_id_and_name_from_handle(cls, handle: str):
@@ -80,9 +88,21 @@ def check_for_new_video(channels):
                 link = video["link"]
                 name = video["author"]
                 published = video["published"]
-                thumbnail = video["media_content"]["media_thumbnail"][0]["url"]
+                thumbnail = video["media_thumbnail"][0]["url"]
                 channel_id = video["yt_channelid"]
+
+                if check_if_short(yt_videoid):
+                    continue
 
                 add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
 
                 send_new_video_notification(title, thumbnail, name, published, link)
+
+def check_if_short(yt_videoid):
+    print("Checking video:", yt_videoid)
+    url = f"https://www.youtube.com/shorts/{yt_videoid}"
+
+    with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+        info = ydl.extract_info(url, download=False)
+
+        return info.get("media_type") == "short"

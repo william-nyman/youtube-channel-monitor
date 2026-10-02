@@ -9,6 +9,16 @@ def get_connection():
     return connection
 
 
+def create_channels_table():
+    with get_connection() as connection:
+        connection.execute("""
+            CREATE TABLE IF NOT EXISTS channels (
+            channel_id TEXT PRIMARY KEY NOT NULL,
+            name TEXT NOT NULL
+            )
+        """)
+
+
 def create_videos_table():
     with get_connection() as connection:
         connection.execute("""
@@ -23,17 +33,10 @@ def create_videos_table():
 
             FOREIGN KEY (channel_id)
                 REFERENCES channels(channel_id)
+            ON DELETE CASCADE
             )
             """)
 
-def create_channels_table():
-    with get_connection() as connection:
-        connection.execute("""
-            CREATE TABLE IF NOT EXISTS channels (
-            channel_id TEXT PRIMARY KEY NOT NULL,
-            name TEXT NOT NULL
-            )
-        """)
 
 
 def save_channel_to_database(channel_id, name):
@@ -100,3 +103,9 @@ def print_video_table():
 
         for row in rows:
             print(row)
+
+def delete_channel(channel_id):
+    with get_connection() as connection:
+        connection.execute("""
+            DELETE FROM CHANNELS WHERE channel_id = ?
+            """,(channel_id,))

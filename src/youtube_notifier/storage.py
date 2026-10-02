@@ -1,6 +1,8 @@
 import sqlite3
 from datetime import datetime
 
+from cli import print_channels
+
 DB_PATH = "data/youtube.db"
 
 def get_connection():
@@ -109,3 +111,11 @@ def delete_channel(channel_id):
         connection.execute("""
             DELETE FROM CHANNELS WHERE channel_id = ?
             """,(channel_id,))
+
+def get_channel_list():
+    with get_connection() as connection:
+        rows = connection.execute("""
+            SELECT * FROM channels
+            """).fetchall()
+
+        print_channels(rows)

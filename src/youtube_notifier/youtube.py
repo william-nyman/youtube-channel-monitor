@@ -44,33 +44,32 @@ class YoutubeChannel:
 
     @classmethod
     def extract_channel_id_and_name_from_handle(cls, handle: str):
-        if re.search('^@[A-Za-z0-9](?:[A-Za-z0-9_.-]{1,28}[A-Za-z0-9])?$', handle):
 
-            r = requests.get(f'https://www.youtube.com/{handle}')
+        r = requests.get(f'https://www.youtube.com/{handle}')
 
-            index = r.text.find('"mainEntity":')
+        index = r.text.find('"mainEntity":')
 
-            section = (r.text[index-50:index+1000])
+        section = (r.text[index-50:index+1000])
 
-            matches =  re.search(r'.+mainEntity":{"@type":"Person","name":"(.+)","url":"https://www.youtube.com/channel/(UC[A-Za-z0-9_-]{22})"', section)
+        matches =  re.search(r'.+mainEntity":{"@type":"Person","name":"(.+)","url":"https://www.youtube.com/channel/(UC[A-Za-z0-9_-]{22})"', section)
 
-            if matches:
-                return cls(
-                    channel_id = matches.group(2),
-                    name = matches.group(1)
-                )
-        else:
-            print("Invalid YouTube handle")
+        if matches:
+            return cls(
+                channel_id = matches.group(2),
+                name = matches.group(1)
+            )
 
 
+def get_youtube_channel(handle):
 
-def get_youtube_channel():
-    handle = input("What is the YouTube handle of the channel you want to track? ").strip()
+    if re.search('^@[A-Za-z0-9](?:[A-Za-z0-9_.-]{1,28}[A-Za-z0-9])?$', handle):
+        channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
 
-    channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
+        if channel is not None and channel.save():
+                channel.set_baseline_video()
 
-    if channel is not None and channel.save():
-            channel.set_baseline_video()
+    else:
+        print("Invalid handle")
 
 
 def check_for_new_video(channels):

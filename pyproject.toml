@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "Setuptools.build_meta"
+
+[project]
+name = "youtube-channel-monitor"
+description = "Python program that monitors YouTube channels for new uploads."
+requires-python = ">=3.11"
+
+dependencies = [
+    "requests",
+    "feedparser",
+    "python-dotenv",
+    "yt-dlp",
+]
+
+[project.scripts]
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -3,8 +3,8 @@ import re
 import feedparser
 import requests
 import yt_dlp
-from notifications import send_new_video_notification
-from storage import (
+from .notifications import send_new_video_notification
+from .storage import (
     add_video_to_database,
     check_if_video_exist_in_database,
     save_channel_to_database,

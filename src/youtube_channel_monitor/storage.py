@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 
-from cli import print_channels
+from .cli import print_channels
 
 DB_PATH = "data/youtube.db"
 

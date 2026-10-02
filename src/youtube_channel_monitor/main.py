@@ -2,15 +2,15 @@ import argparse
 import pathlib
 import time
 
-from config import interval_minutes
-from storage import (
+from .config import interval_minutes
+from .storage import (
     create_channels_table,
     create_videos_table,
     delete_channel,
     get_channel_list,
     return_list_of_channels_in_db,
 )
-from youtube import check_for_new_video, get_youtube_channel
+from .youtube import check_for_new_video, get_youtube_channel
 
 
 def main():

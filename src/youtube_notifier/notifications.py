@@ -17,10 +17,12 @@ def send_new_video_notification(title, thumbnail, name, published, link):
 
     requests.post(
         url,
-        data = f"\n{title}\n\nUploaded at {published_text}\n\n{link}",
+        data = f"\n\n{title} \n\n {published_text}",
         headers = {
             "Title": f"New video from {name}",
             "Attach": thumbnail,
+            "Action": f"view, Watch, {link}",
+            "Markdown": "yes",
             },
             timeout=10,
     )

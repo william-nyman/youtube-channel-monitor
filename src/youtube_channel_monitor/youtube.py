@@ -3,6 +3,7 @@ import re
 import feedparser
 import requests
 import yt_dlp
+
 from .notifications import send_new_video_notification
 from .storage import (
     add_video_to_database,
@@ -38,7 +39,6 @@ class YoutubeChannel:
             channel_id = video["yt_channelid"]
 
             add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
-            send_new_video_notification(title, thumbnail, name, published, link)
 
             return
 
@@ -92,8 +92,6 @@ def check_for_new_video(channels):
                 published = video["published"]
                 thumbnail = video["media_thumbnail"][0]["url"]
                 channel_id = video["yt_channelid"]
-
-
 
                 add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
 

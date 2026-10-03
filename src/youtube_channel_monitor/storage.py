@@ -81,7 +81,6 @@ def add_video_to_database(yt_videoid, title, link, name, published, thumbnail, c
             VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (yt_videoid, title, link, name, published, thumbnail, channel_id))
 
-    print_video_table()
 
 
 def check_if_video_exist_in_database(published, channel_id):
@@ -97,14 +96,7 @@ def check_if_video_exist_in_database(published, channel_id):
 
     return published <= newest_in_database_from_given_channel
 
-def print_video_table():
-    with get_connection() as connection:
-        rows = connection.execute("""
-            SELECT * FROM videos
-            """).fetchall()
 
-        for row in rows:
-            print(row)
 
 def delete_channel(channel_id):
     with get_connection() as connection:

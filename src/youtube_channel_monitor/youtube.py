@@ -3,11 +3,13 @@ import re
 import feedparser
 import requests
 import yt_dlp
+from yt_dlp.utils import DownloadError
 
 from .notifications import send_new_video_notification
 from .storage import (
     add_video_to_database,
     check_if_video_exist_in_database,
+    delete_channel,
     save_channel_to_database,
 )
 
@@ -66,7 +68,12 @@ def get_youtube_channel(handle):
         channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
 
         if channel is not None and channel.save():
+            try:
                 channel.set_baseline_video()
+            except RuntimeError as error:
+                delete_channel(channel.channel_id)
+                print(f"Error: {error}")
+                return
 
     else:
         print("Invalid handle")
@@ -81,8 +88,12 @@ def check_for_new_video(channels):
             channel_id = video["yt_channelid"]
             yt_videoid = video["yt_videoid"]
 
-            if check_if_short(yt_videoid):
-                continue
+            try:
+                if check_if_short(yt_videoid):
+                    continue
+            except RuntimeError as error:
+                print(f"Error: {error}")
+                return
 
             if not check_if_video_exist_in_database(published, channel_id):
                 yt_videoid = video["yt_videoid"]
@@ -98,9 +109,15 @@ def check_for_new_video(channels):
                 send_new_video_notification(title, thumbnail, name, published, link)
 
 def check_if_short(yt_videoid):
-    url = f"https://www.youtube.com/shorts/{yt_videoid}"
+    try:
+        url = f"https://www.youtube.com/shorts/{yt_videoid}"
 
-    with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
-        info = ydl.extract_info(url, download=False)
+        with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
+            info = ydl.extract_info(url, download=False)
 
-        return info.get("media_type") == "short"
+            return info.get("media_type") == "short"
+    except DownloadError as error:
+        raise RuntimeError(
+            "Could not check whether the video is a Short. "
+            "YouTube may be blocking this IP"
+        ) from error

@@ -1,0 +1,16 @@
+[Unit]
+Description=Youtube Channel Monitor
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=ytmonitor
+Group=ytmonitor
+WorkingDirectory=/opt/youtube-channel-monitor
+ExecStart=/opt/youtube-channel-monitor/.venv/bin/ytmonitor run
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

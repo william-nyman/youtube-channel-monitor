@@ -12,7 +12,7 @@ dependencies = [
     "requests",
     "feedparser",
     "python-dotenv",
-    "yt-dlp",
+    "yt-dlp[default]",
 ]
 
 [project.scripts]

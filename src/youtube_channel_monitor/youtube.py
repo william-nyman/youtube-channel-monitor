@@ -2,14 +2,11 @@ import re
 
 import feedparser
 import requests
-import yt_dlp
-from yt_dlp.utils import DownloadError
 
 from .notifications import send_new_video_notification
 from .storage import (
     add_video_to_database,
     check_if_video_exist_in_database,
-    delete_channel,
     save_channel_to_database,
 )
 
@@ -25,17 +22,18 @@ class YoutubeChannel:
     def set_baseline_video(self):
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}')
 
+        print(parsed)
+
         for video in parsed["entries"]:
 
-            yt_videoid = video["yt_videoid"]
+            link = video["link"]
 
-            if check_if_short(yt_videoid):
+            if check_if_short(link):
                 continue
 
             title = video["title"]
-            link = video["link"]
             name = video["author"]
-
+            yt_videoid = video["yt_videoid"]
             published = video["published"]
             thumbnail = video["media_thumbnail"][0]["url"]
             channel_id = video["yt_channelid"]
@@ -76,12 +74,7 @@ def get_youtube_channel(handle):
         channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
 
         if channel is not None and channel.save():
-            try:
-                channel.set_baseline_video()
-            except RuntimeError as error:
-                delete_channel(channel.channel_id)
-                print(f"Error: {error}")
-                return
+            channel.set_baseline_video()
 
     else:
         print("Invalid handle")
@@ -95,17 +88,14 @@ def check_for_new_video(channels):
             published = video["published"]
             channel_id = video["yt_channelid"]
             yt_videoid = video["yt_videoid"]
+            link = video["link"]
 
-            try:
-                if check_if_short(yt_videoid):
-                    continue
-            except RuntimeError as error:
-                print(f"Error: {error}")
-                return
+
+            if check_if_short(link):
+                continue
 
             if not check_if_video_exist_in_database(published, channel_id):
                 title = video["title"]
-                link = video["link"]
                 name = video["author"]
                 thumbnail = video["media_thumbnail"][0]["url"]
 
@@ -113,16 +103,5 @@ def check_for_new_video(channels):
 
                 send_new_video_notification(title, thumbnail, name, published, link)
 
-def check_if_short(yt_videoid):
-    try:
-        url = f"https://www.youtube.com/shorts/{yt_videoid}"
-
-        with yt_dlp.YoutubeDL({"quiet": True}) as ydl:
-            info = ydl.extract_info(url, download=False)
-
-            return info.get("media_type") == "short"
-    except DownloadError as error:
-        raise RuntimeError(
-            "Could not check whether the video is a Short. "
-            "YouTube may be blocking this IP"
-        ) from error
+def check_if_short(link):
+    return re.search(r'https://www\.youtube\.com/shorts/.+', link) is not None

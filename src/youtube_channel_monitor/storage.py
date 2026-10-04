@@ -76,7 +76,15 @@ def return_list_of_channels_in_db():
 def add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id):
     with get_connection() as connection:
         connection.execute("""
-            INSERT OR IGNORE INTO videos (yt_videoid, title, link, name, published, thumbnail, channel_id)
+            INSERT OR IGNORE INTO videos (
+            yt_videoid,
+            title,
+            link,
+            name,
+            published,
+            thumbnail,
+            channel_id
+            )
             VALUES (?, ?, ?, ?, ?, ?, ?)
             """, (yt_videoid, title, link, name, published, thumbnail, channel_id))
 

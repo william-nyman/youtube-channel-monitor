@@ -40,7 +40,15 @@ class YoutubeChannel:
             thumbnail = video["media_thumbnail"][0]["url"]
             channel_id = video["yt_channelid"]
 
-            add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
+            add_video_to_database(
+                yt_videoid,
+                title,
+                link,
+                name,
+                published,
+                thumbnail,
+                channel_id
+            )
 
             return
 
@@ -96,13 +104,10 @@ def check_for_new_video(channels):
                 return
 
             if not check_if_video_exist_in_database(published, channel_id):
-                yt_videoid = video["yt_videoid"]
                 title = video["title"]
                 link = video["link"]
                 name = video["author"]
-                published = video["published"]
                 thumbnail = video["media_thumbnail"][0]["url"]
-                channel_id = video["yt_channelid"]
 
                 add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
 

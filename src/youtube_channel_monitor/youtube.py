@@ -84,17 +84,24 @@ def check_for_new_video(channels):
     for channel in channels:
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={channel["channel_id"]}')
 
-        for video in reversed(parsed["entries"][:3]):
+        normal_videos = []
+
+
+        for video in parsed["entries"]:
+            if not check_if_short(video["link"]):
+                normal_videos.append(video)
+
+            if len(normal_videos) == 3:
+                break
+
+
+        for video in reversed(normal_videos):
             published = video["published"]
             channel_id = video["yt_channelid"]
-            yt_videoid = video["yt_videoid"]
-            link = video["link"]
-
-
-            if check_if_short(link):
-                continue
 
             if not check_if_video_exist_in_database(published, channel_id):
+                yt_videoid = video["yt_videoid"]
+                link = video["link"]
                 title = video["title"]
                 name = video["author"]
                 thumbnail = video["media_thumbnail"][0]["url"]

@@ -104,4 +104,4 @@ def check_for_new_video(channels):
                 send_new_video_notification(title, thumbnail, name, published, link)
 
 def check_if_short(link):
-    return re.search(r'https://www\.youtube\.com/shorts/.+', link) is not None
+    return "/shorts/" in link

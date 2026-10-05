@@ -98,6 +98,9 @@ def check_if_video_exist_in_database(published, channel_id):
             WHERE channel_id = ?
             """,(channel_id,)).fetchone()[0]
 
+    if newest_in_database_from_given_channel is None:
+        return False
+
     published = datetime.fromisoformat(published)
     newest_in_database_from_given_channel = datetime.fromisoformat(newest_in_database_from_given_channel)
 

@@ -68,7 +68,7 @@ def test_save_channel_to_database(db):
 
     assert result is True
 
-    channels = storage.return_list_of_channels_in_db()
+    channels = storage.get_channels()
 
     assert channels == [
         {
@@ -92,7 +92,7 @@ def test_cannot_save_duplicate_channel(db):
     assert first_result is True
     assert second_result is False
 
-    channels = storage.return_list_of_channels_in_db()
+    channels = storage.get_channels()
 
     assert len(channels) == 1
 
@@ -102,7 +102,7 @@ def test_delete_channel(saved_channel):
         saved_channel["channel_id"]
     )
 
-    channels = storage.return_list_of_channels_in_db()
+    channels = storage.get_channels()
 
     assert channels == []
 
@@ -147,7 +147,7 @@ def test_delete_channel_deletes_videos_also(saved_video):
         saved_video["channel_id"]
     )
 
-    channels = storage.return_list_of_channels_in_db()
+    channels = storage.get_channels()
     videos = get_all_videos()
 
     assert channels == []

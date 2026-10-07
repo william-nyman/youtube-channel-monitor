@@ -55,7 +55,7 @@ def save_channel_to_database(channel_id, name):
 
             return False
 
-def return_list_of_channels_in_db():
+def get_channels():
     channels = []
 
     with get_connection() as connection:
@@ -111,11 +111,3 @@ def delete_channel(channel_id):
         connection.execute("""
             DELETE FROM CHANNELS WHERE channel_id = ?
             """,(channel_id,))
-
-def get_channel_list():
-    with get_connection() as connection:
-        rows = connection.execute("""
-            SELECT * FROM channels
-            """).fetchall()
-
-        return rows

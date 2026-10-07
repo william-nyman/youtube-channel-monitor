@@ -8,8 +8,7 @@ from .storage import (
     create_channels_table,
     create_videos_table,
     delete_channel,
-    get_channel_list,
-    return_list_of_channels_in_db,
+    get_channels,
 )
 from .youtube import check_for_new_video, get_youtube_channel
 
@@ -58,13 +57,13 @@ def main():
         delete_channel(args.channel_id)
 
     elif args.command == "list":
-        channels = get_channel_list()
+        channels = get_channels()
         print_channels(channels)
 
 
     elif args.command == "run":
         while True:
-            check_for_new_video(return_list_of_channels_in_db())
+            check_for_new_video(get_channels())
             time.sleep(interval_minutes())
 
 

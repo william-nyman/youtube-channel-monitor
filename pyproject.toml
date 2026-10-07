@@ -13,6 +13,7 @@ dependencies = [
     "feedparser",
     "python-dotenv",
     "yt-dlp[default]",
+    "fastapi[standard]",
 ]
 
 [project.scripts]

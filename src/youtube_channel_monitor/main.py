@@ -2,6 +2,7 @@ import argparse
 import pathlib
 import time
 
+from .cli import print_channels
 from .config import interval_minutes
 from .storage import (
     create_channels_table,
@@ -57,7 +58,9 @@ def main():
         delete_channel(args.channel_id)
 
     elif args.command == "list":
-        get_channel_list()
+        channels = get_channel_list()
+        print_channels(channels)
+
 
     elif args.command == "run":
         while True:

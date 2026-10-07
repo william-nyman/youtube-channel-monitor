@@ -1,8 +1,6 @@
 import sqlite3
 from datetime import datetime
 
-from .cli import print_channels
-
 DB_PATH = "data/youtube.db"
 
 def get_connection():
@@ -120,4 +118,4 @@ def get_channel_list():
             SELECT * FROM channels
             """).fetchall()
 
-        print_channels(rows)
+        return rows

@@ -3,6 +3,9 @@ from datetime import datetime
 
 DB_PATH = "data/youtube.db"
 
+class ChannelNotFoundInDatabaseError(Exception):
+    pass
+
 def get_connection():
     connection = sqlite3.connect(DB_PATH)
     connection.row_factory = sqlite3.Row
@@ -108,6 +111,10 @@ def check_if_video_exist_in_database(published, channel_id):
 
 def delete_channel(channel_id):
     with get_connection() as connection:
-        connection.execute("""
-            DELETE FROM CHANNELS WHERE channel_id = ?
-            """,(channel_id,))
+        cursor = connection.execute(
+            "DELETE FROM channels WHERE channel_id = ?",
+            (channel_id,)
+        )
+
+        if cursor.rowcount == 0:
+            raise ChannelNotFoundInDatabaseError

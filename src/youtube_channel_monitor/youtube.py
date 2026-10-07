@@ -11,6 +11,18 @@ from .storage import (
 )
 
 
+class InvalidHandleError(Exception):
+    pass
+
+
+class ChannelAlreadyExistsError(Exception):
+    pass
+
+
+class ChannelNotFoundError(Exception):
+    pass
+
+
 class YoutubeChannel:
     def __init__(self, channel_id: str, name: str):
         self.channel_id = channel_id
@@ -68,14 +80,22 @@ class YoutubeChannel:
 
 def get_youtube_channel(handle):
 
-    if re.search('^@[A-Za-z0-9](?:[A-Za-z0-9_.-]{1,28}[A-Za-z0-9])?$', handle):
-        channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
+    if not re.search('^@[A-Za-z0-9](?:[A-Za-z0-9_.-]{1,28}[A-Za-z0-9])?$', handle):
+        raise InvalidHandleError
 
-        if channel is not None and channel.save():
-            channel.set_baseline_video()
+    channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
 
-    else:
-        print("Invalid handle")
+    if channel is None:
+        raise ChannelNotFoundError
+
+    if not channel.save():
+        raise ChannelAlreadyExistsError
+
+    channel.set_baseline_video()
+    return channel
+
+
+
 
 
 def check_for_new_video(channels):

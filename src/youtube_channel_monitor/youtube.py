@@ -22,8 +22,6 @@ class YoutubeChannel:
     def set_baseline_video(self):
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}')
 
-        print(parsed)
-
         for video in parsed["entries"]:
 
             link = video["link"]
@@ -109,6 +107,7 @@ def check_for_new_video(channels):
                 add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
 
                 send_new_video_notification(title, thumbnail, name, published, link)
+
 
 def check_if_short(link):
     return "/shorts/" in link

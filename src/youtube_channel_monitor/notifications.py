@@ -6,12 +6,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ntfy_server = os.environ["NTFY_SERVER"]
-ntfy_topic = os.environ["NTFY_TOPIC"]
-
-url = f"{ntfy_server}/{ntfy_topic}"
 
 def send_new_video_notification(title, thumbnail, name, published, link):
+    ntfy_server = os.environ["NTFY_SERVER"]
+    ntfy_topic = os.environ["NTFY_TOPIC"]
+
+    url = f"{ntfy_server}/{ntfy_topic}"
+
     published_dt = datetime.fromisoformat(published)
     published_text = published_dt.strftime("%d %b %Y, %H:%M")
 

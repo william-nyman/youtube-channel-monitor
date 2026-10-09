@@ -16,6 +16,9 @@ dependencies = [
     "fastapi[standard]",
 ]
 
+[project.optional-dependencies]
+test = ["pytest"]
+
 [project.scripts]
 ytmonitor = "youtube_channel_monitor.main:main"
 

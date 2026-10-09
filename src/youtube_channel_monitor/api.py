@@ -15,13 +15,12 @@ class YoutubeHandle(BaseModel):
     handle: str
 
 
-
 @app.get("/")
 def root():
     return {"message": "YouTube Channel Monitor API"}
 
 
-@app.get("/channels")
+@app.get("/channels", status_code=status.HTTP_200_OK)
 def read_channels():
     return storage.get_channels()
 

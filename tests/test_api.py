@@ -30,10 +30,12 @@ def saved_channel(db):
 
     return channel
 
+
 def test_read_channels(saved_channel):
     response = client.get("/channels")
     assert response.status_code == 200
     assert response.json() == [{'channel_id': 'test_channel_id', 'name': 'Test Channel'}]
+
 
 def test_create_channel(monkeypatch):
     monkeypatch.setattr(
@@ -48,3 +50,13 @@ def test_create_channel(monkeypatch):
         "/channels",
         json={"handle": "@testchannel"},
     )
+
+    assert response.status_code == 201
+    assert response.json() == {'channel_id': 'test_channel_id', 'name': 'Test Channel'}
+
+
+def test_delete_channel(saved_channel):
+    response = client.delete("/channels/test_channel_id")
+
+    assert storage.get_channels() == []
+    assert response.status_code == 204

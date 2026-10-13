@@ -1,5 +1,7 @@
 from unittest.mock import Mock
 
+import pytest
+
 from youtube_channel_monitor import youtube
 
 
@@ -17,6 +19,7 @@ def test_check_if_short_returns_false_for_normal_video():
     )
 
     assert result is False
+
 
 def test_existing_video_is_not_added_to_database_or_notified(monkeypatch):
     fake_video = {
@@ -73,6 +76,7 @@ def test_existing_video_is_not_added_to_database_or_notified(monkeypatch):
 
     fake_add_video.assert_not_called()
     fake_notification.assert_not_called()
+
 
 def test_new_video_is_added_to_database_and_notified(monkeypatch):
     fake_video = {
@@ -261,3 +265,36 @@ def test_new_videos_are_added_oldest_first(monkeypatch):
     assert first_call.args[0] == "video_1"
     assert second_call.args[0] == "video_2"
     assert third_call.args[0] == "video_3"
+
+
+def test_invalid_youtube_handle_raises_InvalidHandleError():
+    with pytest.raises(youtube.InvalidHandleError):
+        youtube.get_youtube_channel("@user name")
+
+    with pytest.raises(youtube.InvalidHandleError):
+            youtube.get_youtube_channel("ab")
+
+    with pytest.raises(youtube.InvalidHandleError):
+            youtube.get_youtube_channel("username.")
+
+    with pytest.raises(youtube.InvalidHandleError):
+            youtube.get_youtube_channel("@abcdefghijklmnopqrstuvwxyz12345")
+
+
+def test_already_saved_channel_raises_ChannelAlreadyExistsError(monkeypatch):
+    monkeypatch.setattr(
+        youtube.YoutubeChannel,
+        "save",
+        lambda self: False
+    )
+
+    channel = youtube.YoutubeChannel("channel_123", "Test Channel")
+
+    monkeypatch.setattr(
+        youtube.YoutubeChannel,
+        "extract_channel_id_and_name_from_handle",
+        lambda handle: channel
+    )
+
+    with pytest.raises(youtube.ChannelAlreadyExistsError):
+        youtube.get_youtube_channel("@test-handle")

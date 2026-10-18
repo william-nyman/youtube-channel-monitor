@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, status
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from . import storage
@@ -10,6 +11,8 @@ from .youtube import (
 )
 
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="src/youtube_channel_monitor/static"), name="static")
 
 class YoutubeHandle(BaseModel):
     handle: str

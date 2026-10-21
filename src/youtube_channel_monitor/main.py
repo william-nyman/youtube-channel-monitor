@@ -1,6 +1,9 @@
 import argparse
+import logging
 import pathlib
-import time
+import threading
+
+import uvicorn
 
 from .cli import print_channels
 from .config import interval_minutes
@@ -12,6 +15,15 @@ from .storage import (
 )
 from .youtube import check_for_new_video, get_youtube_channel
 
+
+def run_monitor(stop_event, interval_seconds):
+    while not stop_event.is_set():
+        try:
+            check_for_new_video(get_channels())
+        except Exception:
+            logging.exception("New videos check failed")
+
+        stop_event.wait(interval_seconds)
 
 def main():
     pathlib.Path("data/").mkdir(parents=True, exist_ok=True)
@@ -62,10 +74,22 @@ def main():
 
 
     elif args.command == "run":
-        while True:
-            check_for_new_video(get_channels())
-            time.sleep(interval_minutes())
+        stop_event = threading.Event()
 
+        monitor_thread = threading.Thread(target=run_monitor, args=(stop_event, interval_minutes()))
+
+        monitor_thread.start()
+
+        try:
+            uvicorn.run(
+                "youtube_channel_monitor.api:app",
+                host="0.0.0.0",
+                port=8000,
+                workers=1,
+            )
+        finally:
+            stop_event.set()
+            monitor_thread.join()
 
 if __name__ == "__main__":
     main()

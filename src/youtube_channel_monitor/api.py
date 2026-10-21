@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, status
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -20,7 +21,7 @@ class YoutubeHandle(BaseModel):
 
 @app.get("/")
 def root():
-    return {"message": "YouTube Channel Monitor API"}
+    return FileResponse("src/youtube_channel_monitor/static/index.html")
 
 
 @app.get("/channels", status_code=status.HTTP_200_OK)

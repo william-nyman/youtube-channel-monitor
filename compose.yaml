@@ -8,3 +8,6 @@ services:
 
     volumes:
       - ./data:/app/data
+
+    ports:
+      - "127.0.0.1:8070:8000"

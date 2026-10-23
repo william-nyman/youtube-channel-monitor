@@ -16,7 +16,7 @@ def send_new_video_notification(title, thumbnail, name, published, link):
     published_dt = datetime.fromisoformat(published)
     published_text = published_dt.strftime("%d %b %Y, %H:%M")
 
-    requests.post(
+    response = requests.post(
         url,
         data = f"\n\n{title} \n\n {published_text}",
         headers = {
@@ -27,3 +27,6 @@ def send_new_video_notification(title, thumbnail, name, published, link):
             },
             timeout=10,
     )
+
+    response.raise_for_status()
+    return response.status_code == 200

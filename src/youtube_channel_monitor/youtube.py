@@ -124,9 +124,9 @@ def check_for_new_video(channels):
                 name = video["author"]
                 thumbnail = video["media_thumbnail"][0]["url"]
 
-                add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
+                if send_new_video_notification(title, thumbnail, name, published, link):
+                    add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
 
-                send_new_video_notification(title, thumbnail, name, published, link)
 
 
 def check_if_short(link):

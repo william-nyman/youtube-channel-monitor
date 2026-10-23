@@ -47,7 +47,7 @@ def test_existing_video_is_not_added_to_database_or_notified(monkeypatch):
     monkeypatch.setattr(
         youtube,
         "check_if_video_exist_in_database",
-        lambda published, channel_id: True
+        lambda published, channel_id, yt_videoid: True
     )
 
     fake_add_video = Mock()
@@ -104,7 +104,7 @@ def test_new_video_is_added_to_database_and_notified(monkeypatch):
     monkeypatch.setattr(
         youtube,
         "check_if_video_exist_in_database",
-        lambda published, channel_id: False
+        lambda published, channel_id, yt_videoid: False
     )
 
     fake_add_video = Mock()
@@ -228,7 +228,7 @@ def test_new_videos_are_added_oldest_first(monkeypatch):
     monkeypatch.setattr(
         youtube,
         "check_if_video_exist_in_database",
-        lambda published, channel_id: False
+        lambda published, channel_id, yt_videoid: False
     )
 
     fake_send_notification = Mock()

@@ -91,7 +91,7 @@ def add_video_to_database(yt_videoid, title, link, name, published, thumbnail, c
 
 
 
-def check_if_video_exist_in_database(published, channel_id):
+def check_if_video_exist_in_database(published, channel_id, yt_videoid):
     with get_connection() as connection:
         newest_in_database_from_given_channel = connection.execute("""
             SELECT MAX(published)
@@ -105,7 +105,17 @@ def check_if_video_exist_in_database(published, channel_id):
     published = datetime.fromisoformat(published)
     newest_in_database_from_given_channel = datetime.fromisoformat(newest_in_database_from_given_channel)
 
-    return published <= newest_in_database_from_given_channel
+    with get_connection() as connection:
+        existing_video = connection.execute("""
+            SELECT yt_videoid
+            FROM videos
+            WHERE channel_id = ? AND yt_videoid = ?
+            """, (channel_id, yt_videoid)).fetchone()
+
+        if existing_video is None:
+            return published <= newest_in_database_from_given_channel
+        else:
+            return True
 
 
 

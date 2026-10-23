@@ -116,9 +116,9 @@ def check_for_new_video(channels):
         for video in reversed(normal_videos):
             published = video["published"]
             channel_id = video["yt_channelid"]
+            yt_videoid = video["yt_videoid"]
 
-            if not check_if_video_exist_in_database(published, channel_id):
-                yt_videoid = video["yt_videoid"]
+            if not check_if_video_exist_in_database(published, channel_id, yt_videoid):
                 link = video["link"]
                 title = video["title"]
                 name = video["author"]

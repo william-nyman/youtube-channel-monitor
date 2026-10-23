@@ -157,7 +157,8 @@ def test_delete_channel_deletes_videos_also(saved_video):
 def test_check_if_video_exists(saved_video):
     result = storage.check_if_video_exist_in_database(
         saved_video["published"],
-        saved_video["channel_id"]
+        saved_video["channel_id"],
+        saved_video["yt_videoid"]
     )
 
     assert result is True
@@ -166,7 +167,8 @@ def test_check_if_video_exists(saved_video):
 def test_check_if_video_is_new(saved_video):
     result = storage.check_if_video_exist_in_database(
         "2026-10-05T13:00:00+00:00",
-        saved_video["channel_id"]
+        saved_video["channel_id"],
+        "video_124"
     )
 
     assert result is False
@@ -204,8 +206,9 @@ def test_check_video_only_checks_given_channel(db):
     )
 
     result = storage.check_if_video_exist_in_database(
-        "2026-10-05T13:00:00+00:00",
-        "channel_1"
+        "2026-10-05T20:00:00+00:00",
+        "channel_1",
+        "video_3"
     )
 
     assert result is False
@@ -214,7 +217,8 @@ def test_check_video_only_checks_given_channel(db):
 def test_video_is_new_when_channel_has_no_videos(saved_channel):
     result = storage.check_if_video_exist_in_database(
         "2026-10-05T12:00:00+00:00",
-        saved_channel["channel_id"]
+        saved_channel["channel_id"],
+        ""
     )
 
     assert result is False

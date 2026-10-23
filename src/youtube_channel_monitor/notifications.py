@@ -20,7 +20,7 @@ def send_new_video_notification(title, thumbnail, name, published, link):
         url,
         data = f"\n\n{title} \n\n {published_text}",
         headers = {
-            "Title": f"New video from {name}",
+            "Title": f"New video from {name}".encode(),
             "Attach": thumbnail,
             "Action": f"view, Watch, {link}",
             "Markdown": "yes",

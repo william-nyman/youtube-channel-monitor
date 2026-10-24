@@ -208,7 +208,7 @@ def test_check_video_only_checks_given_channel(db):
     result = storage.check_if_video_exist_in_database(
         "2026-10-05T20:00:00+00:00",
         "channel_1",
-        "video_3"
+        "video_2"
     )
 
     assert result is False

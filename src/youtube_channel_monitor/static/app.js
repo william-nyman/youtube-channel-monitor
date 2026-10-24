@@ -4,6 +4,7 @@ async function getChannels() {
   return channels;
 }
 
+
 async function deleteChannel(channelId) {
   const response = await fetch(`/channels/${channelId}`, {
     method: "delete"
@@ -18,36 +19,38 @@ async function deleteChannel(channelId) {
 
 
 
-function renderChannels(channels) {
+function renderChannels(channels, searchText = "") {
   const channelList = document.getElementById("channels-list");
   channelList.innerHTML = "";
 
   for (const channel of channels) {
-    const channelItem = document.createElement("li");
-    channelItem.textContent = channel.name;
+    if (searchText === "" || channel.name.toLowerCase().includes(searchText)) {
+      const channelItem = document.createElement("li");
+      channelItem.textContent = channel.name;
 
-    const deleteChannelItem = document.createElement("button");
-    deleteChannelItem.textContent = "delete";
+      const deleteChannelItem = document.createElement("button");
+      deleteChannelItem.textContent = "delete";
 
-    channelList.appendChild(channelItem);
-    channelItem.appendChild(deleteChannelItem);
+      channelList.appendChild(channelItem);
+      channelItem.appendChild(deleteChannelItem);
 
-    deleteChannelItem.addEventListener("click", async function () {
-      if (confirm(`Are you sure you want to delete ${channel.name}`)) {
-        if (await deleteChannel(channel.channel_id)) {
-          alert("Deletion was successful");
-          channelItem.remove();
-        } else {
-          alert("Deletion failed");
+      deleteChannelItem.addEventListener("click", async function () {
+        if (confirm(`Are you sure you want to delete ${channel.name}`)) {
+          if (await deleteChannel(channel.channel_id)) {
+            alert("Deletion was successful");
+            channelItem.remove();
+          } else {
+            alert("Deletion failed");
+          }
         }
-      }
-    });
-
+      });
+    }
   }
 }
 
+
 async function addChannel() {
-  const addChannelForm = document.getElementById("add-channel");
+  const addChannelForm = document.getElementById("add-channel-form");
 
   addChannelForm.addEventListener("submit", async function (event) {
     event.preventDefault();
@@ -75,12 +78,21 @@ async function addChannel() {
     } finally {
       submitButton.disabled = false;
     }
-  })
+  });
 }
 
+
 document.addEventListener("DOMContentLoaded", async function () {
-  const channels = await getChannels();
+  let channels = await getChannels();
   renderChannels(channels);
 
+
+  const searchInput = document.getElementById("channel-search");
+  searchInput.addEventListener("input", async function () {
+    let channels = await getChannels();
+    const searchText = searchInput.value.toLowerCase();
+    renderChannels(channels, searchText);
+  });
+  
   addChannel();
 });

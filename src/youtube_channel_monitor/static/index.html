@@ -4,17 +4,26 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>ytmonitor</title>
+	<link rel="stylesheet" href="/static/style.css">
+	<script src="/static/app.js"></script>
 </head>
-<script src="/static/app.js">
 
-</script>
 <body>
     <h1>YouTube Channel Monitor</h1>
+
     <h2>Monitored:</h2>
+
+    <input
+        type="search"
+        id="channel-search"
+        placeholder="Search channels"
+    >
+
 	<ul id="channels-list"></ul>
-	<form id="add-channel">
-    	<label for="handle">Handle:</label><br>
-    	<input type="text" id="handle" name="handle">
+
+	<h2>Add new channel:</h2>
+	<form id="add-channel-form">
+    	<input type="text" placeholder="@handle" id="handle" name="handle">
     	<input id="submit-add-channel"type="submit" value="Add channel">
 	</form>
 </body>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
+
 function App() {
   const [channels, setChannels] = useState([])
 
@@ -18,6 +19,7 @@ function App() {
       console.error(error.message)
     }
   }
+
 
   function handleSearchChange(searchValue) {
     if (searchValue === "") {loadChannels()}
@@ -44,10 +46,38 @@ function App() {
   }
 
 
+  async function handleSubmitClick(event) {
+    event.preventDefault()
+
+    const handle = event.currentTarget.elements.handle.value
+    const form = event.currentTarget
+
+    try {
+      const response = await fetch("/channels", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ "handle": handle })
+      })
+      if (!response.ok) {
+        throw new Error(`Could not add channel: ${response.status} ${await response.text()}`)
+      }
+
+      loadChannels()
+    } catch(error) {
+      console.error(error.message)
+    } finally {
+      form.reset()
+    }
+  }
+
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     loadChannels()
   }, [])
+
 
   return (
     <main>
@@ -61,6 +91,10 @@ function App() {
           </li>
         ))}
       </ul>
+      <form onSubmit={(event) => handleSubmitClick(event)}>
+        <input type="text" placeholder="@handle.." name="handle"></input>
+        <input type="submit" value="Add"></input>
+      </form>
 
     </main>
   )

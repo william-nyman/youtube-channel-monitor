@@ -9,6 +9,7 @@ WORKDIR /app
 COPY pyproject.toml README.md ./
 COPY src/ ./src/
 COPY config.toml ./
+COPY frontend/dist/ ./frontend/dist/
 
 RUN pip install --no-cache-dir .
 

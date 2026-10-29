@@ -13,7 +13,7 @@ from .youtube import (
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="src/youtube_channel_monitor/static"), name="static")
+app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
 
 class YoutubeHandle(BaseModel):
     handle: str
@@ -21,7 +21,7 @@ class YoutubeHandle(BaseModel):
 
 @app.get("/")
 def root():
-    return FileResponse("src/youtube_channel_monitor/static/index.html")
+    return FileResponse("frontend/dist/index.html")
 
 
 @app.get("/channels", status_code=status.HTTP_200_OK)

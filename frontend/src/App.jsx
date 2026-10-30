@@ -81,7 +81,9 @@ function App() {
       <h1>Monitored:</h1>
       <input type="search" placeholder="search for channel..." onChange={(event) => setSearchValue(event.target.value)}></input>
       <ul>
-        {filteredChannels.map((channel) => (
+        {filteredChannels.length === 0 && searchValue != ""
+          ? <p>No matching channels found. Try a different search.</p>
+          : filteredChannels.map((channel) => (
           <li key={channel.channel_id}>
             {channel.name}
             <button onClick={() => handleDeleteClick(channel.name, channel.channel_id)}>Delete</button>

@@ -4,6 +4,19 @@ import './App.css'
 
 function App() {
   const [channels, setChannels] = useState([])
+  const[searchValue, setSearchValue] = useState("")
+
+
+  const filteredChannels = channels.filter((channel) => {
+    return channel.name.toLowerCase().includes(searchValue.toLowerCase())
+  })
+
+
+  useEffect(() => {
+    loadChannels()
+
+  }, [])
+
 
   async function loadChannels() {
     try {
@@ -20,16 +33,6 @@ function App() {
     }
   }
 
-
-  function handleSearchChange(searchValue) {
-    if (searchValue === "") {loadChannels()}
-    const filterBySearch = channels.filter((channel) => {
-      if (channel.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        return channel
-      }
-    })
-    setChannels(filterBySearch)
-  }
 
   async function handleDeleteClick(name, channel_id) {
     if (confirm(`Are you sure you want to delete ${name}`)) {
@@ -73,18 +76,12 @@ function App() {
   }
 
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadChannels()
-  }, [])
-
-
   return (
     <main>
       <h1>Monitored:</h1>
-      <input type="search" placeholder="search for channel..." onChange={(event) => handleSearchChange(event.target.value)}></input>
+      <input type="search" placeholder="search for channel..." onChange={(event) => setSearchValue(event.target.value)}></input>
       <ul>
-        {channels.map((channel) => (
+        {filteredChannels.map((channel) => (
           <li key={channel.channel_id}>
             {channel.name}
             <button onClick={() => handleDeleteClick(channel.name, channel.channel_id)}>Delete</button>

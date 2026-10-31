@@ -5,3 +5,6 @@ data/
 __pycache__/
 *.egg-info/
 .DS_Store
+frontend/node_modules/
+frontend/dist/
+frontend/.pnpm-store/

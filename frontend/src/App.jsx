@@ -78,21 +78,22 @@ function App() {
 
   return (
     <main>
-      <h1>Monitored:</h1>
-      <input type="search" placeholder="search for channel..." onChange={(event) => setSearchValue(event.target.value)}></input>
+      <h2>Monitored:</h2>
+      <input className="search-box" type="search" placeholder="Search for channel..." onChange={(event) => setSearchValue(event.target.value)}></input>
       <ul>
         {filteredChannels.length === 0 && searchValue != ""
           ? <p>No matching channels found. Try a different search.</p>
           : filteredChannels.map((channel) => (
           <li key={channel.channel_id}>
             {channel.name}
-            <button onClick={() => handleDeleteClick(channel.name, channel.channel_id)}>Delete</button>
+            <button className="delete-button" onClick={() => handleDeleteClick(channel.name, channel.channel_id)}>Delete</button>
           </li>
         ))}
       </ul>
-      <form onSubmit={(event) => handleSubmitClick(event)}>
-        <input type="text" placeholder="@handle.." name="handle"></input>
-        <input type="submit" value="Add"></input>
+      <h3>Add new channel:</h3>
+      <form className="add-channel-form" onSubmit={(event) => handleSubmitClick(event)}>
+        <input className="add-channel-input" type="text" placeholder="@handle..." name="handle"></input>
+        <input className="add-channel-submit" type="submit" value="Add"></input>
       </form>
 
     </main>

@@ -40,12 +40,10 @@ li {
 }
 
 .delete-button {
-    padding: 4px 30px;
+    padding: 0px;
     cursor: pointer;
-    border-radius: 4px;
-    background-color: red;
-    border-color: red;
-    color: white;
+    border: none;
+    background: transparent;
 }
 
 .add-channel-form {

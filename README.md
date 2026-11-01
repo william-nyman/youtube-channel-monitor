@@ -72,6 +72,15 @@ The default is ten minutes. After changing this file, rebuild and recreate the c
 docker compose up -d --build
 ```
 
+## Update the program
+
+From the project directory:
+
+```
+git pull origin main
+docker compose up -d --build
+```
+
 ## Usage
 
 ### Web interface

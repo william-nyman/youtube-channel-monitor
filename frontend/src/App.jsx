@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import trashIcon from './assets/trash.svg'
+import linkIcon from  './assets/link.svg'
 
 
 function App() {
@@ -87,7 +88,10 @@ function App() {
           : filteredChannels.map((channel) => (
           <li key={channel.channel_id}>
             {channel.name}
-            <button className="delete-button" onClick={() => handleDeleteClick(channel.name, channel.channel_id)}>{<img src={trashIcon}/>}</button>
+            <div className="channel-actions">
+              <a className="channel-link" href={`https://www.youtube.com/channel/${channel.channel_id}`}>{<img src={linkIcon}/>}</a>
+              <button className="delete-button" onClick={() => handleDeleteClick(channel.name, channel.channel_id)}>{<img src={trashIcon}/>}</button>
+            </div>
           </li>
         ))}
       </ul>

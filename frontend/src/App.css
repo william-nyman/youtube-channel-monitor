@@ -34,9 +34,22 @@ li {
     justify-content: space-between;
     align-items: center;
     background-color: #222;
-    padding: 6px 20px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left:  10px;
+    padding-right:  6px;
     margin: 0 auto;
     margin-bottom: 6px;
+}
+
+.channel-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.channel-link {
+    cursor: pointer;
+    margin-right: 0px;
 }
 
 .delete-button {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import ChannelList from './components/ChannelList'
+import AddForm from './components/AddForm'
 
 
 function App() {
@@ -79,18 +80,21 @@ function App() {
 
   return (
     <main>
+
       <h2>Monitored:</h2>
+
       <ChannelList
         setSearchValue={setSearchValue}
         filteredChannels={filteredChannels}
         searchValue={searchValue}
         handleDeleteClick={handleDeleteClick}
       />
+
       <h3>Add new channel:</h3>
-      <form className="add-channel-form" onSubmit={(event) => handleSubmitClick(event)}>
-        <input className="add-channel-input" type="text" placeholder="@handle..." name="handle"></input>
-        <input className="add-channel-submit" type="submit" value="Add"></input>
-      </form>
+
+      <AddForm
+        handleSubmitClick={handleSubmitClick}
+      />
 
     </main>
   )

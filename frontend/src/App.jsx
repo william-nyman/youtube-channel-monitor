@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import trashIcon from './assets/trash.svg'
-import linkIcon from  './assets/link.svg'
+import ChannelList from './components/ChannelList'
 
 
 function App() {
@@ -81,20 +80,12 @@ function App() {
   return (
     <main>
       <h2>Monitored:</h2>
-      <input className="search-box" type="search" placeholder="Search for channel..." onChange={(event) => setSearchValue(event.target.value)}></input>
-      <ul>
-        {filteredChannels.length === 0 && searchValue != ""
-          ? <p>No matching channels found. Try a different search.</p>
-          : filteredChannels.map((channel) => (
-          <li key={channel.channel_id}>
-            {channel.name}
-            <div className="channel-actions">
-              <a className="channel-link" rel="noopener" target="_blank" href={`https://www.youtube.com/channel/${channel.channel_id}`}>{<img src={linkIcon}/>}</a>
-              <button className="delete-button" onClick={() => handleDeleteClick(channel.name, channel.channel_id)}>{<img src={trashIcon}/>}</button>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <ChannelList
+        setSearchValue={setSearchValue}
+        filteredChannels={filteredChannels}
+        searchValue={searchValue}
+        handleDeleteClick={handleDeleteClick}
+      />
       <h3>Add new channel:</h3>
       <form className="add-channel-form" onSubmit={(event) => handleSubmitClick(event)}>
         <input className="add-channel-input" type="text" placeholder="@handle..." name="handle"></input>

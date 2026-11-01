@@ -15,13 +15,15 @@ from .storage import (
 )
 from .youtube import check_for_new_video, get_youtube_channel
 
+logger = logging.getLogger(__name__)
+
 
 def run_monitor(stop_event, interval_seconds):
     while not stop_event.is_set():
         try:
             check_for_new_video(get_channels())
         except Exception:
-            logging.exception("New videos check failed")
+            logger.exception("New videos check failed")
 
         stop_event.wait(interval_seconds)
 

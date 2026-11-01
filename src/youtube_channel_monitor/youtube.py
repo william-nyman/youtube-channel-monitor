@@ -1,3 +1,4 @@
+import logging
 import re
 
 import feedparser
@@ -9,6 +10,8 @@ from .storage import (
     check_if_video_exist_in_database,
     save_channel_to_database,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class InvalidHandleError(Exception):
@@ -28,8 +31,10 @@ class YoutubeChannel:
         self.channel_id = channel_id
         self.name = name
 
+
     def save(self):
         return save_channel_to_database(self.channel_id, self.name)
+
 
     def set_baseline_video(self):
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}')
@@ -59,6 +64,7 @@ class YoutubeChannel:
             )
 
             return
+
 
     @classmethod
     def extract_channel_id_and_name_from_handle(cls, handle: str):
@@ -95,15 +101,22 @@ def get_youtube_channel(handle):
     return channel
 
 
-
-
-
 def check_for_new_video(channels):
     for channel in channels:
+
         parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={channel["channel_id"]}')
 
-        normal_videos = []
+        status = parsed.get("status")
 
+        if status is not None and not 200 <= status <=300:
+            logger.error(f"Feedparser request failed for {channel['name']}, status code: HHTP {status}")
+            continue
+
+        if parsed.get("bozo"):
+            bozo_exception = parsed.get("bozo_exception")
+            logger.error(f"Feed problem: {bozo_exception}")
+
+        normal_videos = []
 
         for video in parsed["entries"]:
             if not check_if_short(video["link"]):
@@ -126,7 +139,6 @@ def check_for_new_video(channels):
 
                 if send_new_video_notification(title, thumbnail, name, published, link):
                     add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
-
 
 
 def check_if_short(link):

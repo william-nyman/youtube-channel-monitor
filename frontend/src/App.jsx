@@ -89,7 +89,7 @@ function App() {
           <li key={channel.channel_id}>
             {channel.name}
             <div className="channel-actions">
-              <a className="channel-link" href={`https://www.youtube.com/channel/${channel.channel_id}`}>{<img src={linkIcon}/>}</a>
+              <a className="channel-link" rel="noopener" target="_blank" href={`https://www.youtube.com/channel/${channel.channel_id}`}>{<img src={linkIcon}/>}</a>
               <button className="delete-button" onClick={() => handleDeleteClick(channel.name, channel.channel_id)}>{<img src={trashIcon}/>}</button>
             </div>
           </li>

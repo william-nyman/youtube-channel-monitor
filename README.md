@@ -91,6 +91,7 @@ docker compose up -d --build
 Open http://127.0.0.1:8070 to:
 
 - View monitored channels.
+- Sort channels alphabetically or by newest or oldest first.
 - Add a channel using its `@handle`.
 - Remove a channel using its delete button.
 

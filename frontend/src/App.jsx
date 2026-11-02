@@ -7,17 +7,35 @@ import AddForm from './components/AddForm'
 function App() {
   const [channels, setChannels] = useState([])
   const[searchValue, setSearchValue] = useState("")
+  const[sortBy, setSortBy] = useState("newestFirst")
 
 
   const filteredChannels = channels.filter((channel) => {
     return channel.name.toLowerCase().includes(searchValue.toLowerCase())
   })
 
+  const sorted = sortChannels(filteredChannels, sortBy);
+
 
   useEffect(() => {
     loadChannels()
 
   }, [])
+
+
+  function sortChannels(filteredChannels, sortBy) {
+    const sorted = [...filteredChannels];
+
+    if (sortBy === "newestFirst") {
+      sorted.reverse();
+    } else if (sortBy === "nameAscending") {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (sortBy === "nameDescending") {
+      sorted.sort((a, b) => b.name.localeCompare(a.name));
+    }
+
+    return sorted;
+  }
 
 
   async function loadChannels() {
@@ -81,9 +99,12 @@ function App() {
   return (
     <main>
 
-      <h2>Monitored:</h2>
+      <h1>Monitored:</h1>
 
       <ChannelList
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        sorted={sorted}
         setSearchValue={setSearchValue}
         filteredChannels={filteredChannels}
         searchValue={searchValue}

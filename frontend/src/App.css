@@ -3,7 +3,7 @@ main {
     margin: 40px auto;
 }
 
-h2 {
+h1 {
     text-align: center;
 }
 
@@ -11,16 +11,59 @@ h3 {
     text-align: center;
 }
 
+.channel-filters {
+    max-width: 466px;
+    margin: 0 auto;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.sort-wrapper {
+    flex-shrink: 0;
+    position: relative;
+    width: 36px;
+    height: 36px;
+    background-color: #222;
+    border-radius: 10px;
+}
+
+.sort-wrapper:focus-within {
+    outline: 2px solid white;
+    outline-offset: 2px;
+}
+
+
+.sort-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
 .search-box {
+    height: 36px;
+    box-sizing: border-box;
     padding: 10px 50px;
     border-radius: 10px;
     background-color: #222;
     border: none;
     display: block;
-    margin: 0 auto;
+    flex: 1;
+    min-width: 0;
     text-align: center;
     color: white;
 }
+
+.sorting-selector {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
 
 ul {
     list-style: none;

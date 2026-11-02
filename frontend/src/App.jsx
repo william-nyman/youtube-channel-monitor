@@ -8,6 +8,7 @@ function App() {
   const [channels, setChannels] = useState([])
   const[searchValue, setSearchValue] = useState("")
   const[sortBy, setSortBy] = useState("newestFirst")
+  const[visibleCount, setVisibleCount] = useState(10)
 
 
   const filteredChannels = channels.filter((channel) => {
@@ -106,6 +107,8 @@ function App() {
         setSortBy={setSortBy}
         sorted={sorted}
         setSearchValue={setSearchValue}
+        visibleCount={visibleCount}
+        setVisibleCount={setVisibleCount}
         filteredChannels={filteredChannels}
         searchValue={searchValue}
         handleDeleteClick={handleDeleteClick}

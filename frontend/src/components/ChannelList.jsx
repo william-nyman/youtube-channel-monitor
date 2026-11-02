@@ -2,11 +2,16 @@ import trashIcon from '../assets/trash.svg'
 import linkIcon from  '../assets/link.svg'
 import sortIcon from '../assets/sort.svg'
 
+
 export default function ChannelList(props) {
   return (
     <div>
       <div className="channel-filters">
-        <input className="search-box" type="search" placeholder="Search for channel..." onChange={(event) => props.setSearchValue(event.target.value)}></input>
+        <input className="search-box" type="search" placeholder="Search for channel..." onChange={(event) => {
+          props.setSearchValue(event.target.value)
+          props.setVisibleCount(10)
+        }}
+        ></input>
         <div className="sort-wrapper">
           <select className="sorting-selector" value={props.sortBy} onChange={(e) => props.setSortBy(e.target.value)}>
             <option value="newestFirst">Newest first</option>
@@ -20,7 +25,7 @@ export default function ChannelList(props) {
       <ul>
         {props.filteredChannels.length === 0 && props.searchValue != ""
           ? <p>No matching channels found. Try a different search.</p>
-          : props.sorted.map((channel) => (
+          : props.sorted.slice(0, props.visibleCount).map((channel) => (
           <li key={channel.channel_id}>
             {channel.name}
             <div className="channel-actions">
@@ -30,6 +35,15 @@ export default function ChannelList(props) {
           </li>
         ))}
       </ul>
+      <div className="show-buttons-wrapper">
+        {props.visibleCount > 10 && (
+        <button className="show-less-button" onClick={() => props.setVisibleCount(props.visibleCount - 10)}>Show less</button>
+        )}
+
+        {props.sorted.length > props.visibleCount && (
+          <button className="show-more-button" onClick={() => props.setVisibleCount(props.visibleCount + 10)}>Show more</button>
+        )}
+      </div>
     </div>
   )
 }

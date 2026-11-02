@@ -85,6 +85,7 @@ li {
     margin-bottom: 6px;
 }
 
+
 .channel-actions {
     display: flex;
     gap: 8px;
@@ -100,6 +101,27 @@ li {
     cursor: pointer;
     border: none;
     background: transparent;
+}
+
+.show-buttons-wrapper {
+    display: flex;
+    justify-content: center;
+}
+
+.show-more-button {
+    background-color: #222;
+    margin-left: 3px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+
+.show-less-button {
+    background-color: #222;
+    margin-right: 3px;
+    color: white;
+    border: none;
+    border-radius: 8px;
 }
 
 .add-channel-form {

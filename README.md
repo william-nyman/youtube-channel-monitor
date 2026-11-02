@@ -4,6 +4,9 @@
 
 YouTube Channel Monitor is a self-hosted program that monitors YouTube channels and sends a notification through ntfy when a new video is published.
 
+![YouTube Channel Monitor web interface](screenshot.png)
+
+
 ## Motivation
 
 I built this because having YouTube installed on my phone made me spend more time on it. YouTube's recommendation algorithm and Shorts are designed to grab your attention, so I started watching through the browser instead, logged out. That way, I only opened YouTube when I had something specific to watch.

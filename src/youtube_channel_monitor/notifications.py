@@ -18,14 +18,14 @@ def send_new_video_notification(title, thumbnail, name, published, link):
 
     response = requests.post(
         url,
-        data = f"\n\n{title} \n\n {published_text}",
-        headers = {
+        data=f"\n\n{title} \n\n {published_text}",
+        headers={
             "Title": f"New video from {name}".encode(),
             "Attach": thumbnail,
             "Action": f"view, Watch, {link}",
             "Markdown": "yes",
-            },
-            timeout=10,
+        },
+        timeout=10,
     )
 
     response.raise_for_status()

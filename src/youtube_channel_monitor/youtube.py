@@ -31,16 +31,15 @@ class YoutubeChannel:
         self.channel_id = channel_id
         self.name = name
 
-
     def save(self):
         return save_channel_to_database(self.channel_id, self.name)
 
-
     def set_baseline_video(self):
-        parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}')
+        parsed = feedparser.parse(
+            f"https://www.youtube.com/feeds/videos.xml?channel_id={self.channel_id}"
+        )
 
         for video in parsed["entries"]:
-
             link = video["link"]
 
             if check_if_short(link):
@@ -54,39 +53,32 @@ class YoutubeChannel:
             channel_id = video["yt_channelid"]
 
             add_video_to_database(
-                yt_videoid,
-                title,
-                link,
-                name,
-                published,
-                thumbnail,
-                channel_id
+                yt_videoid, title, link, name, published, thumbnail, channel_id
             )
 
             return
 
-
     @classmethod
     def extract_channel_id_and_name_from_handle(cls, handle: str):
 
-        r = requests.get(f'https://www.youtube.com/{handle}')
+        r = requests.get(f"https://www.youtube.com/{handle}")
 
         index = r.text.find('"mainEntity":')
 
-        section = (r.text[index-50:index+1000])
+        section = r.text[index - 50 : index + 1000]
 
-        matches =  re.search(r'.+mainEntity":{"@type":"Person","name":"(.+)","url":"https://www.youtube.com/channel/(UC[A-Za-z0-9_-]{22})"', section)
+        matches = re.search(
+            r'.+mainEntity":{"@type":"Person","name":"(.+)","url":"https://www.youtube.com/channel/(UC[A-Za-z0-9_-]{22})"',
+            section,
+        )
 
         if matches:
-            return cls(
-                channel_id = matches.group(2),
-                name = matches.group(1)
-            )
+            return cls(channel_id=matches.group(2), name=matches.group(1))
 
 
 def get_youtube_channel(handle):
 
-    if not re.search('^@[A-Za-z0-9](?:[A-Za-z0-9_.-]{1,28}[A-Za-z0-9])?$', handle):
+    if not re.search("^@[A-Za-z0-9](?:[A-Za-z0-9_.-]{1,28}[A-Za-z0-9])?$", handle):
         raise InvalidHandleError
 
     channel = YoutubeChannel.extract_channel_id_and_name_from_handle(handle)
@@ -103,13 +95,16 @@ def get_youtube_channel(handle):
 
 def check_for_new_video(channels):
     for channel in channels:
-
-        parsed = feedparser.parse(f'https://www.youtube.com/feeds/videos.xml?channel_id={channel["channel_id"]}')
+        parsed = feedparser.parse(
+            f"https://www.youtube.com/feeds/videos.xml?channel_id={channel['channel_id']}"
+        )
 
         status = parsed.get("status")
 
-        if status is not None and not 200 <= status <=300:
-            logger.error(f"Feedparser request failed for {channel['name']}, status code: HHTP {status}")
+        if status is not None and not 200 <= status <= 300:
+            logger.error(
+                f"Feedparser request failed for {channel['name']}, status code: HHTP {status}"
+            )
             continue
 
         if parsed.get("bozo"):
@@ -125,7 +120,6 @@ def check_for_new_video(channels):
             if len(normal_videos) == 3:
                 break
 
-
         for video in reversed(normal_videos):
             published = video["published"]
             channel_id = video["yt_channelid"]
@@ -138,7 +132,9 @@ def check_for_new_video(channels):
                 thumbnail = video["media_thumbnail"][0]["url"]
 
                 if send_new_video_notification(title, thumbnail, name, published, link):
-                    add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id)
+                    add_video_to_database(
+                        yt_videoid, title, link, name, published, thumbnail, channel_id
+                    )
 
 
 def check_if_short(link):

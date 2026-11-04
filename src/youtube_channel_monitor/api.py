@@ -15,6 +15,7 @@ app = FastAPI()
 
 app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets")
 
+
 class YoutubeHandle(BaseModel):
     handle: str
 
@@ -36,26 +37,20 @@ def create_channel(handle: YoutubeHandle):
 
     except ChannelNotFoundError:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Channel not found"
+            status_code=status.HTTP_404_NOT_FOUND, detail="Channel not found"
         )
 
     except InvalidHandleError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid handle"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid handle"
         )
 
     except ChannelAlreadyExistsError:
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Channel already added"
+            status_code=status.HTTP_409_CONFLICT, detail="Channel already added"
         )
 
-    return {
-            "channel_id": channel.channel_id,
-            "name": channel.name
-    }
+    return {"channel_id": channel.channel_id, "name": channel.name}
 
 
 @app.delete("/channels/{channel_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -66,5 +61,5 @@ def delete_channel(channel_id: str):
     except storage.ChannelNotFoundInDatabaseError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f'Channel with ID "{channel_id}" was not found'
+            detail=f'Channel with ID "{channel_id}" was not found',
         )

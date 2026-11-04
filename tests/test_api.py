@@ -6,6 +6,7 @@ from youtube_channel_monitor.api import app
 
 client = TestClient(app)
 
+
 @pytest.fixture
 def db(tmp_path, monkeypatch):
     test_database = tmp_path / "test.db"
@@ -34,7 +35,9 @@ def saved_channel(db):
 def test_read_channels(saved_channel):
     response = client.get("/channels")
     assert response.status_code == 200
-    assert response.json() == [{'channel_id': 'test_channel_id', 'name': 'Test Channel'}]
+    assert response.json() == [
+        {"channel_id": "test_channel_id", "name": "Test Channel"}
+    ]
 
 
 def test_create_channel(monkeypatch):
@@ -44,7 +47,7 @@ def test_create_channel(monkeypatch):
         lambda handle: youtube.YoutubeChannel(
             channel_id="test_channel_id",
             name="Test Channel",
-        )
+        ),
     )
     response = client.post(
         "/channels",
@@ -52,7 +55,7 @@ def test_create_channel(monkeypatch):
     )
 
     assert response.status_code == 201
-    assert response.json() == {'channel_id': 'test_channel_id', 'name': 'Test Channel'}
+    assert response.json() == {"channel_id": "test_channel_id", "name": "Test Channel"}
 
 
 def test_delete_channel(saved_channel):

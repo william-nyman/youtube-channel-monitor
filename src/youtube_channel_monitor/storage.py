@@ -3,8 +3,10 @@ from datetime import datetime
 
 DB_PATH = "data/youtube.db"
 
+
 class ChannelNotFoundInDatabaseError(Exception):
     pass
+
 
 def get_connection():
     connection = sqlite3.connect(DB_PATH)
@@ -42,41 +44,43 @@ def create_videos_table():
             """)
 
 
-
 def save_channel_to_database(channel_id, name):
-        try:
-            with get_connection() as connection:
-                connection.execute("""
+    try:
+        with get_connection() as connection:
+            connection.execute(
+                """
                     INSERT INTO channels (channel_id, name)
                     VALUES (?, ?)
-                """, (channel_id, name))
+                """,
+                (channel_id, name),
+            )
 
-            return True
+        return True
 
-        except sqlite3.IntegrityError:
-            print("Channel already exists in database")
+    except sqlite3.IntegrityError:
+        print("Channel already exists in database")
 
-            return False
+        return False
+
 
 def get_channels():
     channels = []
 
     with get_connection() as connection:
-        rows = connection.execute(
-            "SELECT channel_id, name FROM channels"
-        ).fetchall()
+        rows = connection.execute("SELECT channel_id, name FROM channels").fetchall()
 
         for row in rows:
-            channels.append({
-                "channel_id": row["channel_id"],
-                "name": row["name"]
-            })
+            channels.append({"channel_id": row["channel_id"], "name": row["name"]})
 
     return channels
 
-def add_video_to_database(yt_videoid, title, link, name, published, thumbnail, channel_id):
+
+def add_video_to_database(
+    yt_videoid, title, link, name, published, thumbnail, channel_id
+):
     with get_connection() as connection:
-        connection.execute("""
+        connection.execute(
+            """
             INSERT OR IGNORE INTO videos (
             yt_videoid,
             title,
@@ -87,30 +91,39 @@ def add_video_to_database(yt_videoid, title, link, name, published, thumbnail, c
             channel_id
             )
             VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (yt_videoid, title, link, name, published, thumbnail, channel_id))
-
+            """,
+            (yt_videoid, title, link, name, published, thumbnail, channel_id),
+        )
 
 
 def check_if_video_exist_in_database(published, channel_id, yt_videoid):
     with get_connection() as connection:
-        newest_in_database_from_given_channel = connection.execute("""
+        newest_in_database_from_given_channel = connection.execute(
+            """
             SELECT MAX(published)
             FROM videos
             WHERE channel_id = ?
-            """,(channel_id,)).fetchone()[0]
+            """,
+            (channel_id,),
+        ).fetchone()[0]
 
     if newest_in_database_from_given_channel is None:
         return False
 
     published = datetime.fromisoformat(published)
-    newest_in_database_from_given_channel = datetime.fromisoformat(newest_in_database_from_given_channel)
+    newest_in_database_from_given_channel = datetime.fromisoformat(
+        newest_in_database_from_given_channel
+    )
 
     with get_connection() as connection:
-        existing_video = connection.execute("""
+        existing_video = connection.execute(
+            """
             SELECT yt_videoid
             FROM videos
             WHERE channel_id = ? AND yt_videoid = ?
-            """, (channel_id, yt_videoid)).fetchone()
+            """,
+            (channel_id, yt_videoid),
+        ).fetchone()
 
         if existing_video is None:
             return published <= newest_in_database_from_given_channel
@@ -118,12 +131,10 @@ def check_if_video_exist_in_database(published, channel_id, yt_videoid):
             return True
 
 
-
 def delete_channel(channel_id):
     with get_connection() as connection:
         cursor = connection.execute(
-            "DELETE FROM channels WHERE channel_id = ?",
-            (channel_id,)
+            "DELETE FROM channels WHERE channel_id = ?", (channel_id,)
         )
 
         if cursor.rowcount == 0:

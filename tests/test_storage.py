@@ -55,39 +55,23 @@ def saved_video(saved_channel):
 
 def get_all_videos():
     with storage.get_connection() as connection:
-        return connection.execute(
-            "SELECT * FROM videos"
-        ).fetchall()
+        return connection.execute("SELECT * FROM videos").fetchall()
 
 
 def test_save_channel_to_database(db):
-    result = storage.save_channel_to_database(
-        "test_channel_id",
-        "Test Channel"
-    )
+    result = storage.save_channel_to_database("test_channel_id", "Test Channel")
 
     assert result is True
 
     channels = storage.get_channels()
 
-    assert channels == [
-        {
-            "channel_id": "test_channel_id",
-            "name": "Test Channel"
-        }
-    ]
+    assert channels == [{"channel_id": "test_channel_id", "name": "Test Channel"}]
 
 
 def test_cannot_save_duplicate_channel(db):
-    first_result = storage.save_channel_to_database(
-        "test_channel_id",
-        "Test Channel"
-    )
+    first_result = storage.save_channel_to_database("test_channel_id", "Test Channel")
 
-    second_result = storage.save_channel_to_database(
-        "test_channel_id",
-        "Test Channel"
-    )
+    second_result = storage.save_channel_to_database("test_channel_id", "Test Channel")
 
     assert first_result is True
     assert second_result is False
@@ -98,9 +82,7 @@ def test_cannot_save_duplicate_channel(db):
 
 
 def test_delete_channel(saved_channel):
-    storage.delete_channel(
-        saved_channel["channel_id"]
-    )
+    storage.delete_channel(saved_channel["channel_id"])
 
     channels = storage.get_channels()
 
@@ -115,7 +97,7 @@ def test_add_video_to_database(saved_channel):
         "Test Channel",
         "2026-10-05T12:00:00+00:00",
         "https://example.com/thumbnail.jpg",
-        saved_channel["channel_id"]
+        saved_channel["channel_id"],
     )
 
     videos = get_all_videos()
@@ -143,9 +125,7 @@ def test_cannot_add_duplicate_video(saved_video):
 
 
 def test_delete_channel_deletes_videos_also(saved_video):
-    storage.delete_channel(
-        saved_video["channel_id"]
-    )
+    storage.delete_channel(saved_video["channel_id"])
 
     channels = storage.get_channels()
     videos = get_all_videos()
@@ -156,9 +136,7 @@ def test_delete_channel_deletes_videos_also(saved_video):
 
 def test_check_if_video_exists(saved_video):
     result = storage.check_if_video_exist_in_database(
-        saved_video["published"],
-        saved_video["channel_id"],
-        saved_video["yt_videoid"]
+        saved_video["published"], saved_video["channel_id"], saved_video["yt_videoid"]
     )
 
     assert result is True
@@ -166,24 +144,16 @@ def test_check_if_video_exists(saved_video):
 
 def test_check_if_video_is_new(saved_video):
     result = storage.check_if_video_exist_in_database(
-        "2026-10-05T13:00:00+00:00",
-        saved_video["channel_id"],
-        "video_124"
+        "2026-10-05T13:00:00+00:00", saved_video["channel_id"], "video_124"
     )
 
     assert result is False
 
 
 def test_check_video_only_checks_given_channel(db):
-    storage.save_channel_to_database(
-        "channel_1",
-        "Channel One"
-    )
+    storage.save_channel_to_database("channel_1", "Channel One")
 
-    storage.save_channel_to_database(
-        "channel_2",
-        "Channel Two"
-    )
+    storage.save_channel_to_database("channel_2", "Channel Two")
 
     storage.add_video_to_database(
         "video_1",
@@ -192,7 +162,7 @@ def test_check_video_only_checks_given_channel(db):
         "Channel One",
         "2026-10-05T12:00:00+00:00",
         "thumbnail_1",
-        "channel_1"
+        "channel_1",
     )
 
     storage.add_video_to_database(
@@ -202,13 +172,11 @@ def test_check_video_only_checks_given_channel(db):
         "Channel Two",
         "2026-10-05T20:00:00+00:00",
         "thumbnail_2",
-        "channel_2"
+        "channel_2",
     )
 
     result = storage.check_if_video_exist_in_database(
-        "2026-10-05T20:00:00+00:00",
-        "channel_1",
-        "video_2"
+        "2026-10-05T20:00:00+00:00", "channel_1", "video_2"
     )
 
     assert result is False
@@ -216,9 +184,7 @@ def test_check_video_only_checks_given_channel(db):
 
 def test_video_is_new_when_channel_has_no_videos(saved_channel):
     result = storage.check_if_video_exist_in_database(
-        "2026-10-05T12:00:00+00:00",
-        saved_channel["channel_id"],
-        ""
+        "2026-10-05T12:00:00+00:00", saved_channel["channel_id"], ""
     )
 
     assert result is False

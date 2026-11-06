@@ -101,7 +101,7 @@ def check_for_new_video(channels):
 
         status = parsed.get("status")
 
-        if status is not None and not 200 <= status <= 300:
+        if status is not None and not 200 <= status < 300:
             logger.error(
                 f"Feedparser request failed for {channel['name']}, status code: HHTP {status}"
             )

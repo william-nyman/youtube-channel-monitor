@@ -1,5 +1,6 @@
 import logging
 import re
+import threading
 
 import feedparser
 import requests
@@ -94,7 +95,7 @@ def get_youtube_channel(handle):
 
 
 def check_for_new_video(channels):
-    for channel in channels:
+    def fetch_and_check_videos(channel):
         parsed = feedparser.parse(
             f"https://www.youtube.com/feeds/videos.xml?channel_id={channel['channel_id']}"
         )
@@ -105,7 +106,7 @@ def check_for_new_video(channels):
             logger.error(
                 f"Feedparser request failed for {channel['name']}, status code: HTTP {status}"
             )
-            continue
+            return
 
         if parsed.get("bozo"):
             bozo_exception = parsed.get("bozo_exception")
@@ -135,6 +136,18 @@ def check_for_new_video(channels):
                     add_video_to_database(
                         yt_videoid, title, link, name, published, thumbnail, channel_id
                     )
+
+    threads = []
+
+    for channel in channels:
+        t = threading.Thread(target=fetch_and_check_videos, args=(channel,))
+        threads.append(t)
+
+    for t in threads:
+        t.start()
+
+    for t in threads:
+        t.join()
 
 
 def check_if_short(link):

@@ -20,7 +20,8 @@ def create_channels_table():
         connection.execute("""
             CREATE TABLE IF NOT EXISTS channels (
             channel_id TEXT PRIMARY KEY NOT NULL,
-            name TEXT NOT NULL
+            name TEXT NOT NULL,
+            monitor_shorts INTEGER NOT NULL DEFAULT 0 CHECK (monitor_shorts IN (0,1))
             )
         """)
 
@@ -67,10 +68,18 @@ def get_channels():
     channels = []
 
     with get_connection() as connection:
-        rows = connection.execute("SELECT channel_id, name FROM channels").fetchall()
+        rows = connection.execute(
+            "SELECT channel_id, name, monitor_shorts FROM channels"
+        ).fetchall()
 
         for row in rows:
-            channels.append({"channel_id": row["channel_id"], "name": row["name"]})
+            channels.append(
+                {
+                    "channel_id": row["channel_id"],
+                    "name": row["name"],
+                    "monitor_shorts": row["monitor_shorts"],
+                }
+            )
 
     return channels
 
@@ -135,6 +144,38 @@ def delete_channel(channel_id):
     with get_connection() as connection:
         cursor = connection.execute(
             "DELETE FROM channels WHERE channel_id = ?", (channel_id,)
+        )
+
+        if cursor.rowcount == 0:
+            raise ChannelNotFoundInDatabaseError
+
+
+def should_monitor_shorts(channel_id):
+    with get_connection() as connection:
+        row = connection.execute(
+            """
+            SELECT monitor_shorts
+            FROM channels
+            WHERE channel_id = ?
+            """,
+            (channel_id,),
+        ).fetchone()
+
+    if row is None:
+        raise ChannelNotFoundInDatabaseError
+
+    return bool(row[0])
+
+
+def set_monitor_shorts(channel_id, monitor_shorts):
+    with get_connection() as connection:
+        cursor = connection.execute(
+            """
+            UPDATE channels
+            set monitor_shorts = ?
+            WHERE channel_id = ?
+            """,
+            (monitor_shorts, channel_id),
         )
 
         if cursor.rowcount == 0:

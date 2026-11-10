@@ -10,6 +10,7 @@ from .storage import (
     add_video_to_database,
     check_if_video_exist_in_database,
     save_channel_to_database,
+    should_monitor_shorts,
 )
 
 logger = logging.getLogger(__name__)
@@ -93,6 +94,30 @@ def get_youtube_channel(handle):
     channel.set_baseline_video()
     return channel
 
+def set_baseline_shorts(channel_id):
+    parsed = feedparser.parse(
+        f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+    )
+
+    for video in parsed["entries"]:
+        link = video["link"]
+
+        if not check_if_short(link):
+            continue
+
+        title = video["title"]
+        name = video["author"]
+        yt_videoid = video["yt_videoid"]
+        published = video["published"]
+        thumbnail = video["media_thumbnail"][0]["url"]
+        channel_id = video["yt_channelid"]
+
+        add_video_to_database(
+            yt_videoid, title, link, name, published, thumbnail, channel_id
+        )
+
+        return
+
 
 def check_for_new_video(channels):
     def fetch_and_check_videos(channel):
@@ -112,16 +137,22 @@ def check_for_new_video(channels):
             bozo_exception = parsed.get("bozo_exception")
             logger.error(f"Feed problem: {bozo_exception}")
 
-        normal_videos = []
+        videos = []
 
-        for video in parsed["entries"]:
-            if not check_if_short(video["link"]):
-                normal_videos.append(video)
+        if not should_monitor_shorts(channel["channel_id"]):
+            for video in parsed["entries"]:
+                if not check_if_short(video["link"]):
+                    videos.append(video)
+                if len(videos) == 5:
+                    break
 
-            if len(normal_videos) == 3:
-                break
+        else:
+            for video in parsed["entries"]:
+                videos.append(video)
+                if len(videos) == 10:
+                    break
 
-        for video in reversed(normal_videos):
+        for video in reversed(videos):
             published = video["published"]
             channel_id = video["yt_channelid"]
             yt_videoid = video["yt_videoid"]

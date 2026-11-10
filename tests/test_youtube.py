@@ -38,6 +38,12 @@ def test_existing_video_is_not_added_to_database_or_notified(monkeypatch):
         lambda published, channel_id, yt_videoid: True,
     )
 
+    monkeypatch.setattr(
+        youtube,
+        "should_monitor_shorts",
+        lambda channel_id: False,
+    )
+
     fake_add_video = Mock()
     fake_notification = Mock()
 
@@ -73,6 +79,13 @@ def test_new_video_is_added_to_database_and_notified(monkeypatch):
         "check_if_video_exist_in_database",
         lambda published, channel_id, yt_videoid: False,
     )
+
+    monkeypatch.setattr(
+        youtube,
+        "should_monitor_shorts",
+        lambda channel_id: False,
+    )
+
 
     fake_add_video = Mock()
     fake_notification = Mock()
@@ -110,6 +123,12 @@ def test_check_if_short_ignores_shorts(monkeypatch):
         youtube,
         "check_if_video_exist_in_database",
         fake_check_if_video_exist_in_database,
+    )
+
+    monkeypatch.setattr(
+        youtube,
+        "should_monitor_shorts",
+        lambda channel_id: False,
     )
 
     channels = [{"channel_id": "channel123", "name": "Test Channel"}]
@@ -158,6 +177,12 @@ def test_new_videos_are_added_oldest_first(monkeypatch):
         youtube,
         "check_if_video_exist_in_database",
         lambda published, channel_id, yt_videoid: False,
+    )
+
+    monkeypatch.setattr(
+        youtube,
+        "should_monitor_shorts",
+        lambda channel_id: False,
     )
 
     fake_send_notification = Mock()

@@ -36,7 +36,7 @@ def test_read_channels(saved_channel):
     response = client.get("/channels")
     assert response.status_code == 200
     assert response.json() == [
-        {"channel_id": "test_channel_id", "name": "Test Channel"}
+        {"channel_id": "test_channel_id", "name": "Test Channel", "monitor_shorts": 0}
     ]
 
 

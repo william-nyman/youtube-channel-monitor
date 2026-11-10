@@ -21,7 +21,8 @@ def create_channels_table():
             CREATE TABLE IF NOT EXISTS channels (
             channel_id TEXT PRIMARY KEY NOT NULL,
             name TEXT NOT NULL,
-            monitor_shorts INTEGER NOT NULL DEFAULT 0 CHECK (monitor_shorts IN (0,1))
+            monitor_shorts INTEGER NOT NULL DEFAULT 0 CHECK (monitor_shorts IN (0,1)),
+            added_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
             )
         """)
 

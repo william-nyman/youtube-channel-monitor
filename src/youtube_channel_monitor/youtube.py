@@ -94,6 +94,7 @@ def get_youtube_channel(handle):
     channel.set_baseline_video()
     return channel
 
+
 def set_baseline_shorts(channel_id):
     parsed = feedparser.parse(
         f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"

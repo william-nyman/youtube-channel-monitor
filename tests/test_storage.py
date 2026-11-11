@@ -65,7 +65,9 @@ def test_save_channel_to_database(db):
 
     channels = storage.get_channels()
 
-    assert channels == [{"channel_id": "test_channel_id", "name": "Test Channel", "monitor_shorts": 0}]
+    assert channels == [
+        {"channel_id": "test_channel_id", "name": "Test Channel", "monitor_shorts": 0}
+    ]
 
 
 def test_cannot_save_duplicate_channel(db):

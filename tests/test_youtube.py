@@ -86,7 +86,6 @@ def test_new_video_is_added_to_database_and_notified(monkeypatch):
         lambda channel_id: False,
     )
 
-
     fake_add_video = Mock()
     fake_notification = Mock()
 

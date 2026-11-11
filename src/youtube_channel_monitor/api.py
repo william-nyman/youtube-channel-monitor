@@ -9,6 +9,7 @@ from .youtube import (
     ChannelNotFoundError,
     InvalidHandleError,
     get_youtube_channel,
+    set_baseline_shorts,
 )
 
 app = FastAPI()
@@ -19,6 +20,8 @@ app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets
 class YoutubeHandle(BaseModel):
     handle: str
 
+class ShortsSetting(BaseModel):
+    monitor_shorts: bool
 
 @app.get("/")
 def root():
@@ -63,3 +66,11 @@ def delete_channel(channel_id: str):
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'Channel with ID "{channel_id}" was not found',
         )
+
+
+@app.patch("/channels/{channel_id}", status_code=status.HTTP_204_NO_CONTENT)
+def update_shorts_setting(channel_id: str, setting: ShortsSetting):
+    if setting.monitor_shorts and not storage.should_monitor_shorts(channel_id):
+        set_baseline_shorts(channel_id)
+
+    storage.set_monitor_shorts(channel_id, setting.monitor_shorts)

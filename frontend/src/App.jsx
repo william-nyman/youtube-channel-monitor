@@ -1,28 +1,23 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import ChannelList from './components/ChannelList'
-import AddForm from './components/AddForm'
-
+import { useEffect, useState } from "react";
+import "./App.css";
+import ChannelList from "./components/ChannelList";
+import AddForm from "./components/AddForm";
 
 function App() {
-  const [channels, setChannels] = useState([])
-  const[searchValue, setSearchValue] = useState("")
-  const[sortBy, setSortBy] = useState("newestFirst")
-  const[visibleCount, setVisibleCount] = useState(10)
-
+  const [channels, setChannels] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [sortBy, setSortBy] = useState("newestFirst");
+  const [visibleCount, setVisibleCount] = useState(10);
 
   const filteredChannels = channels.filter((channel) => {
-    return channel.name.toLowerCase().includes(searchValue.toLowerCase())
-  })
+    return channel.name.toLowerCase().includes(searchValue.toLowerCase());
+  });
 
   const sorted = sortChannels(filteredChannels, sortBy);
 
-
   useEffect(() => {
-    loadChannels()
-
-  }, [])
-
+    loadChannels();
+  }, []);
 
   function sortChannels(filteredChannels, sortBy) {
     const sorted = [...filteredChannels];
@@ -38,43 +33,61 @@ function App() {
     return sorted;
   }
 
-
   async function loadChannels() {
     try {
-      const response = await fetch('/channels')
+      const response = await fetch("/channels");
 
       if (!response.ok) {
-        throw new Error('Could not load channels from database')
+        throw new Error("Could not load channels from database");
       }
 
-      const fetchedChannels = await response.json()
-      setChannels(fetchedChannels)
+      const fetchedChannels = await response.json();
+      setChannels(fetchedChannels);
     } catch (error) {
-      console.error(error.message)
+      console.error(error.message);
     }
   }
-
 
   async function handleDeleteClick(name, channel_id) {
     if (confirm(`Are you sure you want to delete ${name}`)) {
       const response = await fetch(`/channels/${channel_id}`, {
-        method: "delete"
-      })
+        method: "delete",
+      });
       if (response.ok) {
-        alert("Deletion was successfull")
-        loadChannels()
+        alert("Deletion was successfull");
+        loadChannels();
       } else {
-        alert("Deletion failed")
+        alert("Deletion failed");
       }
     }
   }
 
+  async function updateShortsSetting(channel_id, monitor_shorts) {
+    try {
+      const response = await fetch(`/channels/${channel_id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ monitor_shorts: monitor_shorts }),
+      });
+      if (!response.ok) {
+        throw new Error(
+          `Could not change shorts setting: ${response.status} ${await response.text()}`,
+        );
+      }
+
+      loadChannels();
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
 
   async function handleSubmitClick(event) {
-    event.preventDefault()
+    event.preventDefault();
 
-    const handle = event.currentTarget.elements.handle.value
-    const form = event.currentTarget
+    const handle = event.currentTarget.elements.handle.value;
+    const form = event.currentTarget;
 
     try {
       const response = await fetch("/channels", {
@@ -82,24 +95,24 @@ function App() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ "handle": handle })
-      })
+        body: JSON.stringify({ handle: handle }),
+      });
       if (!response.ok) {
-        throw new Error(`Could not add channel: ${response.status} ${await response.text()}`)
+        throw new Error(
+          `Could not add channel: ${response.status} ${await response.text()}`,
+        );
       }
 
-      loadChannels()
-    } catch(error) {
-      console.error(error.message)
+      loadChannels();
+    } catch (error) {
+      console.error(error.message);
     } finally {
-      form.reset()
+      form.reset();
     }
   }
 
-
   return (
     <main>
-
       <h1>Monitored:</h1>
 
       <ChannelList
@@ -112,16 +125,14 @@ function App() {
         filteredChannels={filteredChannels}
         searchValue={searchValue}
         handleDeleteClick={handleDeleteClick}
+        updateShortsSetting={updateShortsSetting}
       />
 
       <h3>Add new channel:</h3>
 
-      <AddForm
-        handleSubmitClick={handleSubmitClick}
-      />
-
+      <AddForm handleSubmitClick={handleSubmitClick} />
     </main>
-  )
+  );
 }
 
-export default App
+export default App;

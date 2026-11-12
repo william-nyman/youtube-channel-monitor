@@ -1,153 +1,190 @@
 main {
-    max-width: 600px;
-    margin: 40px auto;
+  max-width: 600px;
+  margin: 40px auto;
 }
 
 h1 {
-    text-align: center;
+  text-align: center;
 }
 
 h3 {
-    text-align: center;
+  text-align: center;
 }
 
 .channel-filters {
-    max-width: 466px;
-    margin: 0 auto;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    box-sizing: border-box;
+  max-width: 466px;
+  margin: 0 auto;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  box-sizing: border-box;
 }
 
 .sort-wrapper {
-    flex-shrink: 0;
-    position: relative;
-    width: 36px;
-    height: 36px;
-    background-color: #222;
-    border-radius: 10px;
+  flex-shrink: 0;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  background-color: #222;
+  border-radius: 10px;
 }
 
 .sort-wrapper:focus-within {
-    outline: 2px solid white;
-    outline-offset: 2px;
+  outline: 2px solid white;
+  outline-offset: 2px;
 }
 
-
 .sort-icon {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .search-box {
-    height: 36px;
-    box-sizing: border-box;
-    padding: 10px 50px;
-    border-radius: 10px;
-    background-color: #222;
-    border: none;
-    display: block;
-    flex: 1;
-    min-width: 0;
-    text-align: center;
-    color: white;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 10px 50px;
+  border-radius: 10px;
+  background-color: #222;
+  border: none;
+  display: block;
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  color: white;
 }
 
 .sorting-selector {
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
 }
 
-
 ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 li {
-    max-width: 450px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #222;
-    padding-top: 6px;
-    padding-bottom: 6px;
-    padding-left:  10px;
-    padding-right:  6px;
-    margin: 0 auto;
-    margin-bottom: 6px;
+  max-width: 450px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #222;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  padding-left: 10px;
+  padding-right: 6px;
+  margin: 0 auto;
+  margin-bottom: 6px;
 }
 
-
 .channel-actions {
-    display: flex;
-    gap: 8px;
+  display: flex;
+  gap: 8px;
+}
+
+.channel-settings-wrapper {
+  position: relative;
+}
+
+.settings-popover {
+  position: absolute;
+  background-color: #2b2b2b;
+  border: 1px solid #444;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 35%);
+  right: 0;
+  margin-top: 2px;
+  z-index: 1;
+}
+
+.shorts-setting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.channel-settings-button {
+  padding: 1px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.channel-settings-button img {
+  display: block;
+}
+
+.channel-settings-button.is-open {
+  background-color: #444;
+  border-radius: 4px;
+  border: none;
 }
 
 .channel-link {
-    cursor: pointer;
-    margin-right: 0px;
+  cursor: pointer;
+  margin-right: 0px;
 }
 
 .delete-button {
-    padding: 0px;
-    cursor: pointer;
-    border: none;
-    background: transparent;
+  padding: 0px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
 }
 
 .show-buttons-wrapper {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .show-more-button {
-    background-color: #222;
-    margin-left: 3px;
-    color: white;
-    border: none;
-    border-radius: 8px;
+  background-color: #222;
+  margin-left: 3px;
+  color: white;
+  border: none;
+  border-radius: 8px;
 }
 
 .show-less-button {
-    background-color: #222;
-    margin-right: 3px;
-    color: white;
-    border: none;
-    border-radius: 8px;
+  background-color: #222;
+  margin-right: 3px;
+  color: white;
+  border: none;
+  border-radius: 8px;
 }
 
 .add-channel-form {
-    text-align: center;
+  text-align: center;
 }
 
 .add-channel-input {
-    width: 180px;
-    padding: 10px 10px;
-    border-radius: 10px;
-    background-color: #222;
-    border: none;
-    display: block;
-    margin: 0 auto;
-    text-align: center;
-    color: white;
+  width: 180px;
+  padding: 10px 10px;
+  border-radius: 10px;
+  background-color: #222;
+  border: none;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+  color: white;
 }
 
 .add-channel-submit {
-    width: 200px;
-    padding: 10px 50px;
-    border-radius: 10px;
-    background-color: red;
-    color: white;
-    border: none;
-    display: block;
-    margin: 10px auto;
-    cursor: pointer;
+  width: 200px;
+  padding: 10px 50px;
+  border-radius: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  display: block;
+  margin: 10px auto;
+  cursor: pointer;
 }

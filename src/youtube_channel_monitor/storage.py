@@ -109,7 +109,7 @@ def add_video_to_database(
 
 def check_if_video_exist_in_database(published, channel_id, yt_videoid):
     with closing(get_connection()) as connection, connection:
-        newest_in_database_from_given_channel = connection.execute(
+        newest = connection.execute(
             """
             SELECT MAX(published)
             FROM videos
@@ -118,16 +118,13 @@ def check_if_video_exist_in_database(published, channel_id, yt_videoid):
             (channel_id,),
         ).fetchone()[0]
 
-    if newest_in_database_from_given_channel is None:
-        return False
+        if newest is None:
+            return False
 
-    published = datetime.fromisoformat(published)
-    newest_in_database_from_given_channel = datetime.fromisoformat(
-        newest_in_database_from_given_channel
-    )
+        published = datetime.fromisoformat(published)
+        newest = datetime.fromisoformat(newest)
 
-    with closing(get_connection()) as connection, connection:
-        existing_video = connection.execute(
+        matching_video = connection.execute(
             """
             SELECT yt_videoid
             FROM videos
@@ -136,8 +133,8 @@ def check_if_video_exist_in_database(published, channel_id, yt_videoid):
             (channel_id, yt_videoid),
         ).fetchone()
 
-        if existing_video is None:
-            return published <= newest_in_database_from_given_channel
+        if matching_video is None:
+            return published <= newest
         else:
             return True
 

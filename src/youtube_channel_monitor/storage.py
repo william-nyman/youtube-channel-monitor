@@ -1,4 +1,5 @@
 import sqlite3
+from contextlib import closing
 from datetime import datetime
 
 DB_PATH = "data/youtube.db"
@@ -16,7 +17,7 @@ def get_connection():
 
 
 def create_channels_table():
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         connection.execute("""
             CREATE TABLE IF NOT EXISTS channels (
             channel_id TEXT PRIMARY KEY NOT NULL,
@@ -28,7 +29,7 @@ def create_channels_table():
 
 
 def create_videos_table():
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         connection.execute("""
             CREATE TABLE IF NOT EXISTS videos(
             yt_videoid TEXT PRIMARY KEY NOT NULL,
@@ -48,7 +49,7 @@ def create_videos_table():
 
 def save_channel_to_database(channel_id, name):
     try:
-        with get_connection() as connection:
+        with closing(get_connection()) as connection, connection:
             connection.execute(
                 """
                     INSERT INTO channels (channel_id, name)
@@ -68,7 +69,7 @@ def save_channel_to_database(channel_id, name):
 def get_channels():
     channels = []
 
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         rows = connection.execute(
             "SELECT channel_id, name, monitor_shorts FROM channels"
         ).fetchall()
@@ -88,7 +89,7 @@ def get_channels():
 def add_video_to_database(
     yt_videoid, title, link, name, published, thumbnail, channel_id
 ):
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         connection.execute(
             """
             INSERT OR IGNORE INTO videos (
@@ -107,7 +108,7 @@ def add_video_to_database(
 
 
 def check_if_video_exist_in_database(published, channel_id, yt_videoid):
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         newest_in_database_from_given_channel = connection.execute(
             """
             SELECT MAX(published)
@@ -125,7 +126,7 @@ def check_if_video_exist_in_database(published, channel_id, yt_videoid):
         newest_in_database_from_given_channel
     )
 
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         existing_video = connection.execute(
             """
             SELECT yt_videoid
@@ -142,7 +143,7 @@ def check_if_video_exist_in_database(published, channel_id, yt_videoid):
 
 
 def delete_channel(channel_id):
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         cursor = connection.execute(
             "DELETE FROM channels WHERE channel_id = ?", (channel_id,)
         )
@@ -152,7 +153,7 @@ def delete_channel(channel_id):
 
 
 def should_monitor_shorts(channel_id):
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         row = connection.execute(
             """
             SELECT monitor_shorts
@@ -169,7 +170,7 @@ def should_monitor_shorts(channel_id):
 
 
 def set_monitor_shorts(channel_id, monitor_shorts):
-    with get_connection() as connection:
+    with closing(get_connection()) as connection, connection:
         cursor = connection.execute(
             """
             UPDATE channels

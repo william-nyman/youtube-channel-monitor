@@ -69,7 +69,7 @@ def save_channel_to_database(channel_id, name):
 def get_channels():
     channels = []
 
-    with closing(get_connection()) as connection, connection:
+    with closing(get_connection()) as connection:
         rows = connection.execute(
             "SELECT channel_id, name, monitor_shorts FROM channels"
         ).fetchall()
@@ -108,7 +108,7 @@ def add_video_to_database(
 
 
 def check_if_video_exist_in_database(published, channel_id, yt_videoid):
-    with closing(get_connection()) as connection, connection:
+    with closing(get_connection()) as connection:
         newest = connection.execute(
             """
             SELECT MAX(published)
@@ -150,7 +150,7 @@ def delete_channel(channel_id):
 
 
 def should_monitor_shorts(channel_id):
-    with closing(get_connection()) as connection, connection:
+    with closing(get_connection()) as connection:
         row = connection.execute(
             """
             SELECT monitor_shorts

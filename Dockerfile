@@ -23,4 +23,4 @@ COPY --from=frontend-build /frontend/dist/ ./frontend/dist/
 
 RUN pip install --no-cache-dir .
 
-CMD ["ytmonitor", "run"]
+CMD ["python", "-m", "youtube_channel_monitor.main"]

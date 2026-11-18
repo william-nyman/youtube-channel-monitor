@@ -1,12 +1,9 @@
 import argparse
 import logging
 import pathlib
-import threading
 
-import uvicorn
-
+from . import monitor
 from .cli import print_channels
-from .config import interval_minutes
 from .storage import (
     create_channels_table,
     create_videos_table,
@@ -15,19 +12,9 @@ from .storage import (
     set_monitor_shorts,
     should_monitor_shorts,
 )
-from .youtube import check_for_new_video, get_youtube_channel, set_baseline_shorts
+from .youtube import get_youtube_channel, set_baseline_shorts
 
 logger = logging.getLogger(__name__)
-
-
-def run_monitor(stop_event, interval_seconds):
-    while not stop_event.is_set():
-        try:
-            check_for_new_video(get_channels())
-        except Exception:
-            logger.exception("New videos check failed")
-
-        stop_event.wait(interval_seconds)
 
 
 def main():
@@ -85,24 +72,7 @@ def main():
         print_channels(channels)
 
     elif args.command == "run":
-        stop_event = threading.Event()
-
-        monitor_thread = threading.Thread(
-            target=run_monitor, args=(stop_event, interval_minutes())
-        )
-
-        monitor_thread.start()
-
-        try:
-            uvicorn.run(
-                "youtube_channel_monitor.api:app",
-                host="0.0.0.0",
-                port=8000,
-                workers=1,
-            )
-        finally:
-            stop_event.set()
-            monitor_thread.join()
+        monitor.main()
 
 
 if __name__ == "__main__":

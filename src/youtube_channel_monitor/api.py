@@ -20,8 +20,10 @@ app.mount("/assets", StaticFiles(directory="frontend/dist/assets"), name="assets
 class YoutubeHandle(BaseModel):
     handle: str
 
+
 class ShortsSetting(BaseModel):
     monitor_shorts: bool
+
 
 @app.get("/")
 def root():

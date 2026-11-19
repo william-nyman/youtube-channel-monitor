@@ -1,9 +1,7 @@
+import asyncio
 import logging
-import threading
 
-import uvicorn
-
-from . import config, storage, youtube
+from . import storage, youtube
 
 logger = logging.getLogger(__name__)
 
@@ -18,22 +16,11 @@ def run_monitor(stop_event, interval_seconds):
         stop_event.wait(interval_seconds)
 
 
-def main():
-    stop_event = threading.Event()
-
-    monitor_thread = threading.Thread(
-        target=run_monitor, args=(stop_event, config.interval_minutes())
-    )
-
-    monitor_thread.start()
-
-    try:
-        uvicorn.run(
-            "youtube_channel_monitor.api:app",
-            host="0.0.0.0",
-            port=8000,
-            workers=1,
-        )
-    finally:
-        stop_event.set()
-        monitor_thread.join()
+async def watch_monitor_status(monitor_thread, stop_event, server):
+    while not stop_event.is_set():
+        if monitor_thread.is_alive():
+            await asyncio.sleep(10)
+        else:
+            server.should_exit = True
+            logger.critical("Monitor thread has failed. Starting server shutdown...")
+            break

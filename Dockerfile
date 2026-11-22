@@ -5,14 +5,14 @@ WORKDIR /frontend
 RUN npm install --global pnpm@12.21.0
 
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
-
 RUN pnpm install --frozen-lockfile
 
 COPY frontend/ ./
-
-RUN pnpm build
+RUN pnpm run build
 
 FROM python:3.14-slim-trixie
+
+COPY --from=ghcr.io/astral-sh/uv:0.13.9 /uv /uvx /bin/
 
 WORKDIR /app
 

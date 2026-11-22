@@ -1,8 +1,8 @@
-FROM node:24-alpine AS frontend-build
+FROM node:26.13.1-trixie-slim AS frontend-build
 
 WORKDIR /frontend
 
-RUN corepack enable
+RUN npm install --global pnpm@12.21.0
 
 COPY frontend/package.json frontend/pnpm-lock.yaml ./
 
@@ -12,15 +12,15 @@ COPY frontend/ ./
 
 RUN pnpm build
 
-FROM python:3.14-slim
+FROM python:3.14-slim-trixie
 
 WORKDIR /app
 
-COPY pyproject.toml README.md ./
+COPY pyproject.toml uv.lock README.md ./
 COPY src/ ./src/
 COPY config.toml ./
 COPY --from=frontend-build /frontend/dist/ ./frontend/dist/
 
-RUN pip install --no-cache-dir .
+RUN uv sync --locked --no-dev --no-editable
 
-CMD ["python", "-m", "youtube_channel_monitor.main"]
+CMD ["/app/.venv/bin/python", "-m", "youtube_channel_monitor.main"]

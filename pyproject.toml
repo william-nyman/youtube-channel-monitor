@@ -8,16 +8,10 @@ version = "1.0.0"
 description = "Python program that monitors YouTube channels for new uploads."
 requires-python = ">=3.11"
 
-dependencies = [
-    "requests",
-    "feedparser",
-    "python-dotenv",
-    "yt-dlp[default]",
-    "fastapi[standard]",
-]
+dependencies = ["requests", "feedparser", "python-dotenv", "fastapi[standard]"]
 
-[project.optional-dependencies]
-test = ["pytest"]
+[dependency-groups]
+dev = ["pytest"]
 
 [project.scripts]
 ytmonitor = "youtube_channel_monitor.cli:commands"

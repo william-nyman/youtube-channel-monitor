@@ -1,18 +1,14 @@
 {
-  "name": "YouTube Monitor Development",
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": "."
-  },
-  "containerUser": "developer",
-  "remoteUser": "developer",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
-  "workspaceFolder": "/workspace",
-  "runArgs": [
-    "--cap-drop=ALL",
-    "--cap-add=DAC_OVERRIDE",
-    "--cap-add=CHOWN",
-    "--security-opt=no-new-privileges:true",
-    "--publish=127.0.0.1:5173:5173"
-  ]
+    "name": "YouTube Monitor Development",
+    "image": "mcr.microsoft.com/devcontainers/python:3.14-trixie",
+    "features": {
+        "ghcr.io/devcontainers/features/node:2": {
+            "version": "26.13.1",
+            "pnpmVersion": "12.21.0"
+        },
+        "ghcr.io/devcontainers-extra/features/uv:1": {
+            "version": "0.13.9"
+        }
+    },
+    "runArgs": ["--publish=127.0.0.1:5173:5173"]
 }

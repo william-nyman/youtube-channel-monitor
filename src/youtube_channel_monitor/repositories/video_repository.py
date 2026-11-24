@@ -28,7 +28,7 @@ class VideoRepository:
 
         self.connection.execute(
             """
-            INSERT OR IGNORE INTO videos (
+            INSERT INTO videos (
             yt_videoid,
             title,
             link,

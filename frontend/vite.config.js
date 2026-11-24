@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/channels": "http://127.0.0.1:8000",
+      "/channels": "http://host.docker.internal:8070",
     },
   },
 });

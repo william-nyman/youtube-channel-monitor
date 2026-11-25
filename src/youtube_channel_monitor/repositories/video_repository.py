@@ -10,9 +10,9 @@ class VideoRepository:
             CREATE TABLE IF NOT EXISTS videos(
             yt_videoid TEXT PRIMARY KEY NOT NULL,
             title TEXT NOT NULL,
-            link TEXT,
+            link TEXT NOT NULL,
             name TEXT NOT NULL,
-            published TEXT,
+            published TEXT NOT NULL,
             thumbnail TEXT,
             channel_id TEXT NOT NULL,
 

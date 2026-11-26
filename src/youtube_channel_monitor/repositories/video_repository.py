@@ -22,9 +22,7 @@ class VideoRepository:
             )
             """)
 
-    def add_video_to_database(
-        self, yt_videoid, title, link, name, published, thumbnail, channel_id
-    ):
+    def add_video_to_database(self, video):
 
         self.connection.execute(
             """
@@ -39,23 +37,31 @@ class VideoRepository:
             )
             VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (yt_videoid, title, link, name, published, thumbnail, channel_id),
+            (
+                video.yt_videoid,
+                video.title,
+                video.link,
+                video.name,
+                video.published,
+                video.thumbnail,
+                video.channel_id,
+            ),
         )
 
-    def check_if_video_exist_in_database(self, published, channel_id, yt_videoid):
+    def check_if_video_exist_in_database(self, video):
         newest = self.connection.execute(
             """
             SELECT MAX(published)
             FROM videos
             WHERE channel_id = ?
             """,
-            (channel_id,),
+            (video.channel_id,),
         ).fetchone()[0]
 
         if newest is None:
             return False
 
-        published = datetime.fromisoformat(published)
+        published = datetime.fromisoformat(video.published)
         newest = datetime.fromisoformat(newest)
 
         matching_video = self.connection.execute(
@@ -64,7 +70,7 @@ class VideoRepository:
             FROM videos
             WHERE channel_id = ? AND yt_videoid = ?
             """,
-            (channel_id, yt_videoid),
+            (video.channel_id, video.yt_videoid),
         ).fetchone()
 
         if matching_video is None:

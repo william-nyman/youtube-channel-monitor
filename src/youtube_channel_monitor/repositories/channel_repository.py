@@ -1,5 +1,7 @@
 import sqlite3
 
+from ..models import Channel
+
 
 class ChannelNotFoundInDatabaseError(Exception):
     pass
@@ -14,19 +16,23 @@ class ChannelRepository:
             CREATE TABLE IF NOT EXISTS channels (
             channel_id TEXT PRIMARY KEY NOT NULL,
             name TEXT NOT NULL,
-            monitor_shorts INTEGER NOT NULL DEFAULT 0 CHECK (monitor_shorts IN (0,1)),
-            added_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
-            )
+            monitor_shorts INTEGER NOT NULL CHECK(monitor_shorts IN (0, 1)),
+            added_at TEXT NOT NULL)
         """)
 
-    def save_channel(self, channel_id, name):
+    def save_channel(self, channel):
         try:
             self.connection.execute(
                 """
-                    INSERT INTO channels (channel_id, name)
-                    VALUES (?, ?)
+                    INSERT INTO channels (channel_id, name, monitor_shorts, added_at)
+                    VALUES (?, ?, ?, ?)
                 """,
-                (channel_id, name),
+                (
+                    channel.channel_id,
+                    channel.name,
+                    channel.monitor_shorts,
+                    channel.added_at,
+                ),
             )
 
             return True
@@ -40,36 +46,37 @@ class ChannelRepository:
         channels = []
 
         rows = self.connection.execute(
-            "SELECT channel_id, name, monitor_shorts FROM channels"
+            "SELECT channel_id, name, monitor_shorts, added_at FROM channels"
         ).fetchall()
 
         for row in rows:
             channels.append(
-                {
-                    "channel_id": row["channel_id"],
-                    "name": row["name"],
-                    "monitor_shorts": row["monitor_shorts"],
-                }
+                Channel(
+                    channel_id=row["channel_id"],
+                    name=row["name"],
+                    monitor_shorts=bool(row["monitor_shorts"]),
+                    added_at=row["added_at"],
+                )
             )
 
         return channels
 
-    def delete_channel(self, channel_id):
+    def delete_channel(self, channel):
         rows = self.connection.execute(
-            "DELETE FROM channels WHERE channel_id = ?", (channel_id,)
+            "DELETE FROM channels WHERE channel_id = ?", (channel.channel_id,)
         )
 
         if rows.rowcount == 0:
             raise ChannelNotFoundInDatabaseError
 
-    def should_monitor_shorts(self, channel_id):
+    def should_monitor_shorts(self, channel):
         row = self.connection.execute(
             """
             SELECT monitor_shorts
             FROM channels
             WHERE channel_id = ?
             """,
-            (channel_id,),
+            (channel.channel_id,),
         ).fetchone()
 
         if row is None:
@@ -77,14 +84,14 @@ class ChannelRepository:
 
         return bool(row[0])
 
-    def set_monitor_shorts(self, channel_id, monitor_shorts):
+    def set_monitor_shorts(self, channel):
         row = self.connection.execute(
             """
             UPDATE channels
             set monitor_shorts = ?
             WHERE channel_id = ?
             """,
-            (monitor_shorts, channel_id),
+            (channel.monitor_shorts, channel.channel_id),
         )
 
         if row.rowcount == 0:

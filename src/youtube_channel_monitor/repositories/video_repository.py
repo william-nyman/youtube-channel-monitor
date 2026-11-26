@@ -22,7 +22,7 @@ class VideoRepository:
             )
             """)
 
-    def add_video_to_database(self, video):
+    def save_video(self, video):
 
         self.connection.execute(
             """

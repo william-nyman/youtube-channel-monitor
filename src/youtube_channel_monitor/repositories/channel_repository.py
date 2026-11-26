@@ -1,10 +1,7 @@
 import sqlite3
 
+from ..exceptions import ChannelAlreadyExistsError, ChannelNotFoundInDatabaseError
 from ..models import Channel
-
-
-class ChannelNotFoundInDatabaseError(Exception):
-    pass
 
 
 class ChannelRepository:
@@ -40,7 +37,7 @@ class ChannelRepository:
         except sqlite3.IntegrityError:
             print("Channel already exists in database")
 
-            return False
+            raise ChannelAlreadyExistsError
 
     def get_channels(self):
         channels = []
@@ -61,22 +58,22 @@ class ChannelRepository:
 
         return channels
 
-    def delete_channel(self, channel):
+    def delete_channel(self, channel_id):
         rows = self.connection.execute(
-            "DELETE FROM channels WHERE channel_id = ?", (channel.channel_id,)
+            "DELETE FROM channels WHERE channel_id = ?", (channel_id,)
         )
 
         if rows.rowcount == 0:
             raise ChannelNotFoundInDatabaseError
 
-    def should_monitor_shorts(self, channel):
+    def should_monitor_shorts(self, channel_id):
         row = self.connection.execute(
             """
             SELECT monitor_shorts
             FROM channels
             WHERE channel_id = ?
             """,
-            (channel.channel_id,),
+            (channel_id,),
         ).fetchone()
 
         if row is None:
@@ -84,14 +81,14 @@ class ChannelRepository:
 
         return bool(row[0])
 
-    def set_monitor_shorts(self, channel):
+    def set_monitor_shorts(self, channel_id, monitor_shorts):
         row = self.connection.execute(
             """
             UPDATE channels
             set monitor_shorts = ?
             WHERE channel_id = ?
             """,
-            (channel.monitor_shorts, channel.channel_id),
+            (monitor_shorts, channel_id),
         )
 
         if row.rowcount == 0:

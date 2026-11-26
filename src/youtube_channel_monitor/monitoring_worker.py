@@ -1,7 +1,10 @@
 import asyncio
 import logging
 
-from . import storage, youtube
+from youtube_channel_monitor import monitoring_service
+
+from .repositories import database
+from .repositories.channel_repository import ChannelRepository
 
 logger = logging.getLogger(__name__)
 
@@ -9,7 +12,10 @@ logger = logging.getLogger(__name__)
 def run_monitor(stop_event, interval_seconds):
     while not stop_event.is_set():
         try:
-            youtube.check_for_new_video(storage.get_channels())
+            with database.transaction() as connection:
+                channels = ChannelRepository(connection).get_channels()
+
+            monitoring_service.check_for_new_videos(channels)
         except Exception:
             logger.exception("New videos check failed")
 

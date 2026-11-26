@@ -1,6 +1,8 @@
 import argparse
 
-from . import storage, youtube
+from . import monitoring_service
+from .repositories import database
+from .repositories.channel_repository import ChannelRepository
 
 
 def commands():
@@ -32,22 +34,34 @@ def commands():
     args = parser.parse_args()
 
     if args.command == "add":
-        youtube.get_youtube_channel(args.handle)
+        monitoring_service.add_new_channel(args.handle)
 
     elif args.command == "delete":
-        storage.delete_channel(args.channel_id)
+        with database.transaction() as connection:
+            ChannelRepository(connection).delete_channel(args.channel_id)
 
     elif args.command == "shorts":
         if args.setting == "on":
-            if not storage.should_monitor_shorts(args.channel_id):
-                youtube.set_baseline_shorts(args.channel_id)
-                storage.set_monitor_shorts(args.channel_id, True)
+            with database.transaction() as connection:
+                should_monitor_shorts = ChannelRepository(
+                    connection
+                ).should_monitor_shorts(args.channel_id)
+
+            if not should_monitor_shorts:
+                monitoring_service.set_baseline_short(args.channel_id)
+                with database.transaction() as connection:
+                    ChannelRepository(connection).set_monitor_shorts(
+                        args.channel_id, True
+                    )
 
         elif args.setting == "off":
-            storage.set_monitor_shorts(args.channel_id, False)
+            with database.transaction() as connection:
+                ChannelRepository(connection).set_monitor_shorts(args.channel_id, False)
 
     elif args.command == "list":
-        channels = storage.get_channels()
+        with database.transaction() as connection:
+            channels = ChannelRepository(connection).get_channels()
+
         print_channels(channels)
 
 
@@ -57,5 +71,5 @@ def print_channels(channels):
     print("_" * 67)
 
     for channel in channels:
-        shorts_status = "On" if channel["monitor_shorts"] else "Off"
-        print(f"{channel['name']:<20} {channel['channel_id']:<30} {shorts_status}")
+        shorts_status = "On" if channel.monitor_shorts else "Off"
+        print(f"{channel.name:<20} {channel.channel_id:<30} {shorts_status}")

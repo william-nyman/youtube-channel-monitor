@@ -3,14 +3,15 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import storage
-from .youtube import (
+from . import monitoring_service
+from .exceptions import (
     ChannelAlreadyExistsError,
     ChannelNotFoundError,
+    ChannelNotFoundInDatabaseError,
     InvalidHandleError,
-    get_youtube_channel,
-    set_baseline_shorts,
 )
+from .repositories import database
+from .repositories.channel_repository import ChannelRepository
 
 app = FastAPI()
 
@@ -32,13 +33,16 @@ def root():
 
 @app.get("/channels", status_code=status.HTTP_200_OK)
 def read_channels():
-    return storage.get_channels()
+    with database.transaction() as connection:
+        channels = ChannelRepository(connection).get_channels()
+
+    return channels
 
 
 @app.post("/channels", status_code=status.HTTP_201_CREATED)
 def create_channel(handle: YoutubeHandle):
     try:
-        channel = get_youtube_channel(handle.handle)
+        channel = monitoring_service.add_new_channel(handle.handle)
 
     except ChannelNotFoundError:
         raise HTTPException(
@@ -61,9 +65,10 @@ def create_channel(handle: YoutubeHandle):
 @app.delete("/channels/{channel_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_channel(channel_id: str):
     try:
-        storage.delete_channel(channel_id)
+        with database.transaction() as connection:
+            ChannelRepository(connection).delete_channel(channel_id)
 
-    except storage.ChannelNotFoundInDatabaseError:
+    except ChannelNotFoundInDatabaseError:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'Channel with ID "{channel_id}" was not found',
@@ -72,7 +77,15 @@ def delete_channel(channel_id: str):
 
 @app.patch("/channels/{channel_id}", status_code=status.HTTP_204_NO_CONTENT)
 def update_shorts_setting(channel_id: str, setting: ShortsSetting):
-    if setting.monitor_shorts and not storage.should_monitor_shorts(channel_id):
-        set_baseline_shorts(channel_id)
+    with database.transaction() as connection:
+        should_monitor_shorts = ChannelRepository(connection).should_monitor_shorts(
+            channel_id
+        )
 
-    storage.set_monitor_shorts(channel_id, setting.monitor_shorts)
+    if setting.monitor_shorts and not should_monitor_shorts:
+        monitoring_service.set_baseline_short(channel_id)
+
+    with database.transaction() as connection:
+        ChannelRepository(connection).set_monitor_shorts(
+            channel_id, setting.monitor_shorts
+        )
